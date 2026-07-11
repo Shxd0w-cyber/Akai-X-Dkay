@@ -13,10 +13,10 @@ gui.Parent = playerGui
 -- Create main frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 400, 0, 500)
-mainFrame.Position = UDim2.new(0, 50, 0, 50)
+mainFrame.Size = UDim2.new(0, 500, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
 mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-mainFrame.BorderSizePixel = 1
+mainFrame.BorderSizePixel = 2
 mainFrame.BorderColor3 = Color3.fromRGB(0, 255, 100)
 mainFrame.Parent = gui
 
@@ -58,22 +58,23 @@ closeBtn.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
--- Content area
+-- Content area - FIXED BACKGROUND
 local contentFrame = Instance.new("Frame")
 contentFrame.Name = "ContentFrame"
-contentFrame.Size = UDim2.new(1, -10, 1, -50)
-contentFrame.Position = UDim2.new(0, 5, 0, 45)
-contentFrame.BackgroundTransparency = 1
+contentFrame.Size = UDim2.new(1, 0, 1, -40)
+contentFrame.Position = UDim2.new(0, 0, 0, 40)
+contentFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+contentFrame.BorderSizePixel = 0
 contentFrame.Parent = mainFrame
 
 -- Status label
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Name = "StatusLabel"
-statusLabel.Size = UDim2.new(1, 0, 0, 35)
-statusLabel.Position = UDim2.new(0, 0, 0, 0)
+statusLabel.Size = UDim2.new(1, -20, 0, 40)
+statusLabel.Position = UDim2.new(0, 10, 0, 10)
 statusLabel.BackgroundTransparency = 1
 statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-statusLabel.TextSize = 14
+statusLabel.TextSize = 16
 statusLabel.Font = Enum.Font.GothamBold
 statusLabel.Text = "✓ Optimizing..."
 statusLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -82,21 +83,22 @@ statusLabel.Parent = contentFrame
 -- Optimization info
 local infoLabel = Instance.new("TextLabel")
 infoLabel.Name = "InfoLabel"
-infoLabel.Size = UDim2.new(1, 0, 1, -40)
-infoLabel.Position = UDim2.new(0, 0, 0, 40)
-infoLabel.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-infoLabel.BorderSizePixel = 0
+infoLabel.Size = UDim2.new(1, -20, 1, -60)
+infoLabel.Position = UDim2.new(0, 10, 0, 50)
+infoLabel.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+infoLabel.BorderColor3 = Color3.fromRGB(0, 200, 80)
+infoLabel.BorderSizePixel = 1
 infoLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-infoLabel.TextSize = 12
+infoLabel.TextSize = 13
 infoLabel.Font = Enum.Font.Gotham
 infoLabel.TextWrapped = true
 infoLabel.TextYAlignment = Enum.TextYAlignment.Top
-infoLabel.Text = "Loading..."
+infoLabel.Text = "Loading optimizations..."
 infoLabel.TextIndent = 10
 infoLabel.Parent = contentFrame
 
 -- ============================================
--- FPS COUNTER (Separate Floating Button)
+-- FPS COUNTER (Floating Button at Top Left)
 -- ============================================
 
 local fpsGui = Instance.new("ScreenGui")
@@ -106,15 +108,16 @@ fpsGui.Parent = playerGui
 
 local fpsButton = Instance.new("TextButton")
 fpsButton.Name = "FPSCounter"
-fpsButton.Size = UDim2.new(0, 100, 0, 35)
-fpsButton.Position = UDim2.new(0, 10, 0, 10)
+fpsButton.Size = UDim2.new(0, 100, 0, 40)
+fpsButton.Position = UDim2.new(0, 15, 0, 15)
 fpsButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-fpsButton.BackgroundTransparency = 0.6
+fpsButton.BackgroundTransparency = 0.5
 fpsButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-fpsButton.TextSize = 14
+fpsButton.TextSize = 16
 fpsButton.Font = Enum.Font.GothamBold
 fpsButton.Text = "FPS: 60"
-fpsButton.BorderSizePixel = 0
+fpsButton.BorderSizePixel = 1
+fpsButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 fpsButton.Parent = fpsGui
 
 -- FPS Counter Logic
@@ -137,6 +140,8 @@ end)
 -- ============================================
 -- FPS BOOST & OPTIMIZATION
 -- ============================================
+
+print("Starting FPS optimizations...")
 
 -- Disable unnecessary rendering
 game.Lighting.GlobalShadows = false
@@ -216,25 +221,28 @@ end)
 -- UPDATE GUI STATUS
 -- ============================================
 
+wait(1)
+
 local optimizations = {
     "✓ Graphics Quality: Level 1",
-    "✓ Shadows: Disabled",
-    "✓ Particles: Disabled",
+    "✓ Shadows: DISABLED",
+    "✓ Particles: DISABLED",
     "✓ Fog Distance: 500",
-    "",
+    "✓ Brightness: 2x",
+    " ",
     "✓ Anti-Lag: ACTIVE",
     "✓ Desync Fix: ACTIVE",
     "✓ Memory Cleanup: ACTIVE",
-    "",
+    " ",
     "📊 FPS Counter: Top Left",
-    "",
-    "Status: Complete!"
+    " ",
+    "Status: All Systems GO!",
 }
 
-wait(0.5)
 infoLabel.Text = table.concat(optimizations, "\n")
 statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
-statusLabel.Text = "✓ All Optimizations Active"
+statusLabel.Text = "✓ All Optimizations Active - Ready to Play!"
 
-print("✓ FPS Optimizer Loaded!")
-print("✓ FPS Counter enabled at top left")
+print("✓ FPS Optimizer Loaded Successfully!")
+print("✓ FPS Counter enabled at top left corner")
+print("✓ All optimizations are ACTIVE")
