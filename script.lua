@@ -1,6 +1,6 @@
 --[[
-    AKAI-X-DKAY - Server Tuner v1.2
-    Re-designed UI & Optimization Framework
+    AKAI-X-DKAY - Server Tuner v1.4
+    Enhanced Window Controls (Close, Minimize & Custom GitHub Icon)
 --]]
 
 local players = game:GetService("Players")
@@ -97,7 +97,6 @@ local function optimizeLighting()
             terrain.WaterTransparency = 0
         end
         
-        -- Smooth threaded distribution loop to prevent mobile game freezing
         task.spawn(function()
             local count = 0
             for _, child in ipairs(workspace:GetDescendants()) do
@@ -129,12 +128,9 @@ local function cleanEffects()
     end
 end
 
--- Core Engine Network/Optimization & Garbage Collector Loop
 task.spawn(function()
     while task.wait(3) do
         if masterLagReduction then
-            
-            -- Uncap frame cycles (Forces extreme game loop responsiveness up to 999 FPS)
             local setfpscapFunc = setfpscap or set_fps_cap
             if setfpscapFunc then
                 setfpscapFunc(999)
@@ -146,7 +142,6 @@ task.spawn(function()
             safeboxSetFFlag("DFFlagThreadedSteppedFix", true)
             safeboxSetFFlag("FFlagDebugReportPhysicsErrors", false)
 
-            -- Garbage Collection Engine & RAM Leak Sweeper
             if toggleStates.memoryCleanup then
                 for _, obj in ipairs(workspace:GetDescendants()) do
                     if obj:IsA("Explosion") or obj:IsA("ShirtGraphic") then
@@ -163,7 +158,6 @@ task.spawn(function()
                 print("[Akai-X-Dkay] Cleaned local memory registers & geometric caches.")
             end
             
-            -- Network & Ping Stabilizer Logic
             if toggleStates.pingStabilizer or toggleStates.packetThrottling then
                 safeboxSetFFlag("FFlagThrottleUnreliablePackets", true)
                 safeboxSetFFlag("DFFlagFixPingSpikes", true)
@@ -212,13 +206,58 @@ hudLabel.Visible = false
 hudLabel.Parent = hudGui
 
 --------------------------------------------------------------------------------
--- UI CONSTRUCTION (Akai-X-Dkay Interface Theme)
+-- UI CONSTRUCTION & RESTORE BADGE MATRIX (WITH GITHUB IMAGE SCRAPER)
 --------------------------------------------------------------------------------
 local gui = Instance.new("ScreenGui")
 gui.Name = "AkaiXDkayServerTuner"
 gui.ResetOnSpawn = false
 gui.Parent = playerGui
 
+-- Secure Download Pipeline for your Custom GitHub Attachment Image
+local iconWebURL = "https://github.com/user-attachments/assets/03eb56a0-21d7-4c36-ab83-1a421287e3be"
+local localAssetPath = "AkaiCustomBadgeIcon.png"
+
+pcall(function()
+    if writefile and getcustomasset then
+        local success, imageData = pcall(function() return game:HttpGet(iconWebURL) end)
+        if success and imageData then
+            writefile(localAssetPath, imageData)
+        end
+    end
+end)
+
+-- Floating Restore Circle Badge (Upgraded to ImageButton)
+local restoreCircle = Instance.new("ImageButton")
+restoreCircle.Name = "RestoreBadge"
+restoreCircle.Size = UDim2.new(0, 55, 0, 55)
+restoreCircle.Position = UDim2.new(0.05, 0, 0.2, 0)
+restoreCircle.BackgroundColor3 = Color3.fromRGB(20, 25, 35) -- Matches panel theme
+restoreCircle.Visible = false
+restoreCircle.Active = true
+restoreCircle.Draggable = true
+restoreCircle.Parent = gui
+
+-- Dynamic asset checking
+if getcustomasset and pcall(function() getcustomasset(localAssetPath) end) then
+    restoreCircle.Image = getcustomasset(localAssetPath)
+else
+    -- Fallback classic high-tech backup icon if download features are locked
+    restoreCircle.Image = "rbxassetid://10848301131"
+end
+
+restoreCircle.ImageColor3 = Color3.fromRGB(255, 255, 255)
+restoreCircle.ScaleType = Enum.ScaleType.Fit
+
+local badgeCorner = Instance.new("UICorner")
+badgeCorner.CornerRadius = UDim.new(1, 0)
+badgeCorner.Parent = restoreCircle
+
+local badgeStroke = Instance.new("UIStroke")
+badgeStroke.Color = Color3.fromRGB(255, 76, 76) -- Red accent line edge
+badgeStroke.Thickness = 2
+badgeStroke.Parent = restoreCircle
+
+-- Main Core Window
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 650, 0, 420)
@@ -242,7 +281,7 @@ local headerText = Instance.new("TextLabel")
 headerText.Size = UDim2.new(0, 350, 0, 30)
 headerText.Position = UDim2.new(0, 20, 0, 10)
 headerText.BackgroundTransparency = 1
-headerText.Text = "⚡ <font color='#ff4c4c'>AKAI-X-DKAY</font> - Server Tuner v1.2"
+headerText.Text = "⚡ <font color='#ff4c4c'>AKAI-X-DKAY</font> - Server Tuner v1.4"
 headerText.RichText = true
 headerText.TextSize = 14
 headerText.Font = Enum.Font.GothamBold
@@ -250,6 +289,7 @@ headerText.TextColor3 = Color3.fromRGB(160, 175, 200)
 headerText.TextXAlignment = Enum.TextXAlignment.Left
 headerText.Parent = mainFrame
 
+-- Window Operation Actions (Close, Minimize, Restore)
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 25, 0, 25)
 closeBtn.Position = UDim2.new(1, -35, 0, 10)
@@ -259,7 +299,30 @@ closeBtn.TextColor3 = Color3.fromRGB(90, 105, 130)
 closeBtn.TextSize = 16
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.Parent = mainFrame
-closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0, 25, 0, 25)
+minimizeBtn.Position = UDim2.new(1, -65, 0, 10)
+minimizeBtn.BackgroundTransparency = 1
+minimizeBtn.Text = "⎯"
+minimizeBtn.TextColor3 = Color3.fromRGB(90, 105, 130)
+minimizeBtn.TextSize = 14
+minimizeBtn.Font = Enum.Font.GothamBold
+minimizeBtn.Parent = mainFrame
+
+closeBtn.MouseButton1Click:Connect(function() 
+    gui:Destroy() 
+end)
+
+minimizeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    restoreCircle.Visible = true
+end)
+
+restoreCircle.MouseButton1Click:Connect(function()
+    restoreCircle.Visible = false
+    mainFrame.Visible = true
+end)
 
 --------------------------------------------------------------------------------
 -- PANELS AND INTERFACE TABS
@@ -297,7 +360,6 @@ local antiLagPanel = generatePanel("AntiLag", true)
 local desyncPanel = generatePanel("Desync", false)
 local settingsPanel = generatePanel("Settings", false)
 
--- Navigation Controller
 local function createTabButton(name, iconText, targetPanel, startActive)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, 0, 0, 45)
@@ -474,65 +536,4 @@ local function createToggleRow(title, desc, stateKey, parentPanel)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, -10, 0, 55)
     container.BackgroundColor3 = Color3.fromRGB(18, 22, 32)
-    container.Parent = parentPanel
-    Instance.new("UICorner", container).CornerRadius = UDim.new(0, 6)
-    Instance.new("UIStroke", container).Color = Color3.fromRGB(28, 35, 50)
-
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, -100, 0, 20)
-    label.Position = UDim2.new(0, 65, 0, 8)
-    label.BackgroundTransparency = 1
-    label.Text = title .. (toggleStates[stateKey] and " <font color='#ff4c4c'>(ON)</font>" or " <font color='#78879b'>(OFF)</font>")
-    label.RichText = true
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.Font = Enum.Font.GothamBold
-    label.TextSize = 12
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    label.Parent = container
-
-    local descLabel = Instance.new("TextLabel")
-    descLabel.Size = UDim2.new(1, -100, 0, 20)
-    descLabel.Position = UDim2.new(0, 65, 0, 26)
-    descLabel.BackgroundTransparency = 1
-    descLabel.Text = desc
-    descLabel.TextColor3 = Color3.fromRGB(120, 135, 155)
-    descLabel.Font = Enum.Font.Gotham
-    descLabel.TextSize = 10
-    descLabel.TextXAlignment = Enum.TextXAlignment.Left
-    descLabel.Parent = container
-
-    local switchBg = Instance.new("Frame")
-    switchBg.Size = UDim2.new(0, 42, 0, 22)
-    switchBg.Position = UDim2.new(0, 12, 0.5, -11)
-    switchBg.BackgroundColor3 = toggleStates[stateKey] and Color3.fromRGB(255, 76, 76) or Color3.fromRGB(40, 48, 68)
-    switchBg.Parent = container
-    Instance.new("UICorner", switchBg).CornerRadius = UDim.new(1, 0)
-
-    local switchKnob = Instance.new("Frame")
-    switchKnob.Size = UDim2.new(0, 16, 0, 16)
-    switchKnob.Position = toggleStates[stateKey] and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8)
-    switchKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    switchKnob.Parent = switchBg
-    Instance.new("UICorner", switchKnob).CornerRadius = UDim.new(1, 0)
-
-    buildGuiToggle(container, stateKey, title, switchBg, switchKnob, label)
-end
-
----------------------------------------------------
--- GENERATE INITIAL CONTENT DOMAIN MAP
---------------------------------------------------------------------------------
-createToggleRow("FPS OVERLAY", "Pins pure black FPS tracking onto your left viewport edge", "fpsOverlay", statusPanel)
-
-createSliderRow("MANUAL RENDER RANGE", "Scales engine chunk rendering algorithms", optimizationPanel)
-createToggleRow("TEXTURE COMPRESSION", "Forces global asset models into fast configurations", "graphics", optimizationPanel)
-
-createToggleRow("LIGHTING TUNER", "Lowers heavy engines & dynamic shadows", "graphics", antiLagPanel)
-createToggleRow("PARTICLE OPTIMIZER", "Limits intense engine visual effects & smoke", "particles", antiLagPanel)
-createToggleRow("DE-SYNC ANTI-LAG", "Optimizes internal frame caching network loops", "antiLag", antiLagPanel)
-createToggleRow("MEMORY CLEANUP", "Automatically flushes garbage collections & uncaps scheduling limits", "memoryCleanup", antiLagPanel)
-
-createToggleRow("PACKET THROTTLING", "Throttles unreliability buffers to compress network loads", "packetThrottling", desyncPanel)
-createToggleRow("PING STABILIZER", "Optimizes physical replication send rate and packet processing lag", "pingStabilizer", desyncPanel)
-
-createToggleRow("AUTOMATIC RUNTIME", "Executes optimizations silently upon player spawn cycles", "autoRun", settingsPanel)
-createToggleRow("INTERFACE SHADOWS", "Toggles backend borders to lower rendering drawcalls", "uiShadows", settingsPanel)       
+    contain
