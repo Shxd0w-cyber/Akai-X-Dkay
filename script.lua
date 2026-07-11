@@ -57,7 +57,7 @@ closeBtn.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
--- Content area - FIXED BACKGROUND
+-- Content area
 local contentFrame = Instance.new("Frame")
 contentFrame.Name = "ContentFrame"
 contentFrame.Size = UDim2.new(1, 0, 1, -40)
@@ -95,10 +95,7 @@ infoLabel.TextYAlignment = Enum.TextYAlignment.Top
 infoLabel.Text = "Loading optimizations..."
 infoLabel.Parent = contentFrame
 
--- ============================================
 -- FPS COUNTER (Floating Button at Top Left)
--- ============================================
-
 local fpsGui = Instance.new("ScreenGui")
 fpsGui.Name = "FPSGui"
 fpsGui.ResetOnSpawn = false
@@ -126,7 +123,6 @@ local currentFPS = 0
 runService.RenderStepped:Connect(function()
     frameCount = frameCount + 1
     local currentTime = tick()
-    
     if currentTime - lastUpdate >= 1 then
         currentFPS = frameCount
         fpsButton.Text = "FPS: " .. currentFPS
@@ -135,27 +131,21 @@ runService.RenderStepped:Connect(function()
     end
 end)
 
--- ============================================
--- FPS BOOST & OPTIMIZATION
--- ============================================
-
+-- FPS BOOST
 print("Starting FPS optimizations...")
 
--- Disable unnecessary rendering
 game.Lighting.GlobalShadows = false
 game.Lighting.Brightness = 2
 
--- Lower quality level
 pcall(function()
     settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
 end)
 
--- Reduce fog distance
 pcall(function()
     game.Lighting.Fog.FogEnd = 500
 end)
 
--- Disable particles and effects
+-- Disable particles
 local function disableEffects()
     for _, v in ipairs(workspace:GetDescendants()) do
         if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") then
@@ -166,10 +156,7 @@ end
 
 disableEffects()
 
--- ============================================
--- ANTI-LAG & ANTI-FREEZE
--- ============================================
-
+-- ANTI-LAG
 local antiLagEnabled = true
 
 runService.Heartbeat:Connect(function()
@@ -184,10 +171,7 @@ runService.Heartbeat:Connect(function()
     end
 end)
 
--- ============================================
 -- DESYNC FIX
--- ============================================
-
 pcall(function()
     local character = player.Character or player.CharacterAdded:Wait()
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
@@ -201,10 +185,7 @@ pcall(function()
     end)
 end)
 
--- ============================================
 -- ANTI-FREEZE (Memory Management)
--- ============================================
-
 local lastMemoryClear = tick()
 runService.Heartbeat:Connect(function()
     if tick() - lastMemoryClear > 30 then
@@ -215,10 +196,7 @@ runService.Heartbeat:Connect(function()
     end
 end)
 
--- ============================================
--- UPDATE GUI STATUS
--- ============================================
-
+-- Update GUI
 wait(1)
 
 local optimizations = {
@@ -239,8 +217,7 @@ local optimizations = {
 
 infoLabel.Text = table.concat(optimizations, "\n")
 statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
-statusLabel.Text = "✓ All Optimizations Active - Ready to Play!"
+statusLabel.Text = "✓ All Optimizations Active!"
 
-print("✓ FPS Optimizer Loaded Successfully!")
-print("✓ FPS Counter enabled at top left corner")
-print("✓ All optimizations are ACTIVE")
+print("✓ FPS Optimizer Loaded!")
+print("✓ FPS Counter at top left")
