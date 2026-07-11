@@ -1,4 +1,4 @@
---[[
+    --[[
     AKAI-X-DKAY - Server Tuner v1.2
     Re-designed UI & Optimization Framework
 --]]
@@ -30,7 +30,7 @@ local toggleStates = {
     memoryCleanup = true,
     fpsOverlay = false,
     
-    -- Desync Panel States (Dynamic mapping directly to your FastFlags)
+    -- Desync Panel States
     packetThrottling = false,
     pingStabilizer = false,
     
@@ -41,7 +41,7 @@ local toggleStates = {
 
 local renderDistanceValue = 200
 
--- Safe wrapper logic to apply FFlags natively if supported by executor environment
+-- Safe environment FFlag function handler
 local function safeboxSetFFlag(flagName, value)
     local setfflagFunc = setfflag or set_fflag or (syn and syn.set_fflag)
     if setfflagFunc then
@@ -52,19 +52,17 @@ local function safeboxSetFFlag(flagName, value)
 end
 
 --------------------------------------------------------------------------------
--- ADVANCED ENGINE INTERPOLATION BACKEND (REAL PERFORMANCE OVERRIDE)
+-- ADVANCED ENGINE INTERPOLATION BACKEND
 --------------------------------------------------------------------------------
 
--- 1. Graphics, Materials, & Shadows Optimizer (FFlagDisableShadows/FFlagDisableMaterials)
+-- 1. Graphics, Materials, & Shadows Optimizer
 local function optimizeLighting()
     if not toggleStates.graphics then
-        -- Native Engine Overrides
         safeboxSetFFlag("FFlagDisableShadows", true)
         safeboxSetFFlag("FFlagDisableMaterials", true)
         safeboxSetFFlag("DFIntGraphicsQualityLevel", 1)
         safeboxSetFFlag("FFlagGraphicsSkipLODCheck", true)
         
-        -- Standard Luau Fallback Updates
         lighting.GlobalShadows = false
         lighting.Decoration = false
         if lighting:FindFirstChild("Atmosphere") then lighting.Atmosphere:Destroy() end
@@ -87,7 +85,7 @@ local function optimizeLighting()
     end
 end
 
--- 2. Particle & Effect Cleaner (FFlagDisableParticles & FFlagDisableEffects)
+-- 2. Particle & Effect Cleaner
 local function cleanEffects()
     if not toggleStates.particles then
         safeboxSetFFlag("FFlagDisableParticles", true)
@@ -101,12 +99,11 @@ local function cleanEffects()
     end
 end
 
--- 3. Live FFlag Injector & Core Network Performance Loop
+-- 3. Live FFlag Injector & Core Network Loop
 task.spawn(function()
     while task.wait(3) do
         if masterLagReduction then
             
-            -- Trigger your requested Frame Scheduler Flags dynamically if performance drops
             local setfpscapFunc = setfpscap or set_fps_cap
             if setfpscapFunc then
                 setfpscapFunc(240)
@@ -128,21 +125,15 @@ task.spawn(function()
                 debug.setmemorylimit(1024 * 1024 * 1024) 
             end
             
-            -- Network Packet Throttling Engine (FFlagThrottleUnreliablePackets / DFFlagFixPingSpikes)
+            -- Network Buffers
             if toggleStates.packetThrottling then
                 safeboxSetFFlag("FFlagThrottleUnreliablePackets", true)
                 safeboxSetFFlag("DFFlagFixPingSpikes", true)
                 safeboxSetFFlag("DFIntNetworkMinSendInterval", 15)
-                
-                settings().Network.IncomingReplicationLag = 0
             end
             
-            -- Ping Stabilizer Engine (FFlagNetworkUseNewTransport / Threaded Fixes)
             if toggleStates.pingStabilizer then
                 safeboxSetFFlag("FFlagNetworkUseNewTransport", true)
-                settings().Network.DataSendRate = 60
-            else
-                settings().Network.DataSendRate = 30
             end
         end
     end
@@ -160,7 +151,7 @@ local hudLabel = Instance.new("TextLabel")
 hudLabel.Size = UDim2.new(0, 120, 0, 30)
 hudLabel.Position = UDim2.new(0, 15, 0.4, 0)
 hudLabel.BackgroundTransparency = 1
-hudLabel.TextColor3 = Color3.fromRGB(0, 0, 0) -- Pure Black
+hudLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
 hudLabel.Font = Enum.Font.GothamBold
 hudLabel.TextSize = 16
 hudLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -386,12 +377,6 @@ local function createSliderRow(title, desc, parentPanel)
     fill.BackgroundColor3 = Color3.fromRGB(255, 76, 76)
     fill.Parent = slideBar
     Instance.new("UICorner", fill)
-    
-    runService.RenderStepped:Connect(function()
-        if not toggleStates.graphics then
-            settings().Rendering.DrawDistanceMax = renderDistanceValue
-        end
-    end)
 end
 
 --------------------------------------------------------------------------------
@@ -489,8 +474,8 @@ createToggleRow("PARTICLE OPTIMIZER", "Limits intense engine visual effects & sm
 createToggleRow("DE-SYNC ANTI-LAG", "Optimizes internal frame caching network loops", "antiLag", antiLagPanel)
 createToggleRow("MEMORY CLEANUP", "Automatically flushes garbage collections", "memoryCleanup", antiLagPanel)
 
--- Desync Tab: Custom Mapped via provided FastFlags optimizations
 createToggleRow("PACKET THROTTLING", "Throttles unreliability buffers to prevent data spikes", "packetThrottling", desyncPanel)
 createToggleRow("PING STABILIZER", "Forces safe internal transport layers to smooth ping gaps", "pingStabilizer", desyncPanel)
 
-createToggleRow("AUTOMATIC RUNTIME", "Executes optimizations silently upon player
+createToggleRow("AUTOMATIC RUNTIME", "Executes optimizations silently upon player spawn cycles", "autoRun", settingsPanel)
+createToggleRow("INTERFACE SHADOWS", "Toggles backend borders to lower rendering drawcalls", "uiShadows", settingsPanel)
