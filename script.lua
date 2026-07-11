@@ -1,11 +1,6 @@
--- Akai X Dkay Script
--- Main script entry point
+-- Akai X Dkay Script - Delta Executor Compatible
+-- Simple test script
 
-print("Script loaded successfully!")
-
--- You can add your Lua code here
-local function main()
-    print("Running main function...")
-end
-
-main()
+game.Players.LocalPlayer:WaitForChild("Character")
+print("Delta Script Loaded!")
+warn("Script is running successfully!")
