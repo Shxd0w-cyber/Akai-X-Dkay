@@ -22,8 +22,8 @@ gui.Parent = playerGui
 -- Create main frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 550, 0, 550)
-mainFrame.Position = UDim2.new(0.5, -275, 0.5, -275)
+mainFrame.Size = UDim2.new(0, 600, 0, 500)
+mainFrame.Position = UDim2.new(0.5, -300, 0.5, -250)
 mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 mainFrame.BorderSizePixel = 2
 mainFrame.BorderColor3 = Color3.fromRGB(0, 255, 100)
@@ -32,7 +32,7 @@ mainFrame.Parent = gui
 -- Title bar
 local titleBar = Instance.new("Frame")
 titleBar.Name = "TitleBar"
-titleBar.Size = UDim2.new(1, 0, 0, 40)
+titleBar.Size = UDim2.new(1, 0, 0, 50)
 titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 titleBar.BorderSizePixel = 0
 titleBar.Parent = mainFrame
@@ -43,7 +43,7 @@ titleText.Name = "Title"
 titleText.Size = UDim2.new(1, -50, 1, 0)
 titleText.BackgroundTransparency = 1
 titleText.TextColor3 = Color3.fromRGB(0, 255, 100)
-titleText.TextSize = 18
+titleText.TextSize = 20
 titleText.Font = Enum.Font.GothamBold
 titleText.Text = "⚡ FPS Optimizer"
 titleText.TextXAlignment = Enum.TextXAlignment.Left
@@ -52,8 +52,8 @@ titleText.Parent = titleBar
 -- Close button
 local closeBtn = Instance.new("TextButton")
 closeBtn.Name = "CloseBtn"
-closeBtn.Size = UDim2.new(0, 40, 0, 40)
-closeBtn.Position = UDim2.new(1, -40, 0, 0)
+closeBtn.Size = UDim2.new(0, 50, 0, 50)
+closeBtn.Position = UDim2.new(1, -50, 0, 0)
 closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
 closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeBtn.TextSize = 20
@@ -69,85 +69,94 @@ end)
 -- Content area
 local contentFrame = Instance.new("Frame")
 contentFrame.Name = "ContentFrame"
-contentFrame.Size = UDim2.new(1, 0, 1, -40)
-contentFrame.Position = UDim2.new(0, 0, 0, 40)
+contentFrame.Size = UDim2.new(1, 0, 1, -50)
+contentFrame.Position = UDim2.new(0, 0, 0, 50)
 contentFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 contentFrame.BorderSizePixel = 0
 contentFrame.Parent = mainFrame
 
--- ScrollingFrame for options
-local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Name = "ScrollFrame"
-scrollFrame.Size = UDim2.new(1, -20, 1, -20)
-scrollFrame.Position = UDim2.new(0, 10, 0, 10)
-scrollFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-scrollFrame.BorderColor3 = Color3.fromRGB(0, 200, 80)
-scrollFrame.BorderSizePixel = 1
-scrollFrame.ScrollBarThickness = 8
-scrollFrame.Parent = contentFrame
-
--- Create toggle items
-local function createToggleItem(parent, name, key, yPosition)
+-- Create toggle switch function
+local function createToggleSwitch(parent, name, key, yPosition)
     local container = Instance.new("Frame")
     container.Name = name .. "Container"
-    container.Size = UDim2.new(1, -10, 0, 45)
-    container.Position = UDim2.new(0, 5, 0, yPosition)
-    container.BackgroundTransparency = 1
+    container.Size = UDim2.new(1, -40, 0, 50)
+    container.Position = UDim2.new(0, 20, 0, yPosition)
+    container.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+    container.BorderColor3 = Color3.fromRGB(60, 60, 70)
+    container.BorderSizePixel = 1
     container.Parent = parent
     
     -- Label
     local label = Instance.new("TextLabel")
     label.Name = name .. "Label"
-    label.Size = UDim2.new(0.6, 0, 1, 0)
-    label.Position = UDim2.new(0, 5, 0, 0)
+    label.Size = UDim2.new(0, 300, 1, 0)
+    label.Position = UDim2.new(0, 15, 0, 0)
     label.BackgroundTransparency = 1
     label.TextColor3 = Color3.fromRGB(200, 200, 200)
-    label.TextSize = 14
+    label.TextSize = 16
     label.Font = Enum.Font.Gotham
     label.Text = name
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = container
     
-    -- Toggle Button
+    -- Toggle Background
+    local toggleBg = Instance.new("Frame")
+    toggleBg.Name = name .. "BG"
+    toggleBg.Size = UDim2.new(0, 60, 0, 30)
+    toggleBg.Position = UDim2.new(1, -90, 0.5, -15)
+    toggleBg.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+    toggleBg.BorderSizePixel = 0
+    toggleBg.Parent = container
+    
+    -- Toggle Circle (Knob)
+    local toggleCircle = Instance.new("Frame")
+    toggleCircle.Name = name .. "Circle"
+    toggleCircle.Size = UDim2.new(0, 26, 0, 26)
+    toggleCircle.Position = UDim2.new(0, 2, 0.5, -13)
+    toggleCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    toggleCircle.BorderSizePixel = 0
+    toggleCircle.Parent = toggleBg
+    
+    -- Toggle Button (invisible clickable area)
     local toggleBtn = Instance.new("TextButton")
     toggleBtn.Name = name .. "Toggle"
-    toggleBtn.Size = UDim2.new(0, 80, 0, 35)
-    toggleBtn.Position = UDim2.new(0.6, 5, 0, 5)
-    toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
-    toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggleBtn.TextSize = 13
-    toggleBtn.Font = Enum.Font.GothamBold
-    toggleBtn.Text = "✓ ON"
-    toggleBtn.BorderSizePixel = 0
+    toggleBtn.Size = UDim2.new(0, 60, 0, 30)
+    toggleBtn.Position = UDim2.new(1, -90, 0.5, -15)
+    toggleBtn.BackgroundTransparency = 1
+    toggleBtn.TextTransparency = 1
     toggleBtn.Parent = container
     
     -- Toggle function
+    local function updateToggle()
+        if toggleStates[key] then
+            toggleBg.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+            toggleCircle:TweenPosition(UDim2.new(0, 32, 0.5, -13), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+        else
+            toggleBg.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+            toggleCircle:TweenPosition(UDim2.new(0, 2, 0.5, -13), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+        end
+    end
+    
     toggleBtn.MouseButton1Click:Connect(function()
         toggleStates[key] = not toggleStates[key]
+        updateToggle()
         
         if toggleStates[key] then
-            toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
-            toggleBtn.Text = "✓ ON"
             print("✓ " .. name .. " ENABLED")
         else
-            toggleBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-            toggleBtn.Text = "✗ OFF"
             print("✗ " .. name .. " DISABLED")
         end
     end)
     
-    return toggleBtn
+    return toggleBg, toggleCircle
 end
 
 -- Create toggle items
-local graphicsToggle = createToggleItem(scrollFrame, "Graphics Optimization", "graphics", 5)
-local particlesToggle = createToggleItem(scrollFrame, "Disable Particles", "particles", 55)
-local antiLagToggle = createToggleItem(scrollFrame, "Anti-Lag", "antiLag", 105)
-local desyncToggle = createToggleItem(scrollFrame, "Desync Fix", "desyncFix", 155)
-local memoryToggle = createToggleItem(scrollFrame, "Memory Cleanup", "memoryCleanup", 205)
-
--- Update scroll size
-scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 255)
+local graphicsToggle = createToggleSwitch(contentFrame, "Graphics Optimization", "graphics", 10)
+local particlesToggle = createToggleSwitch(contentFrame, "Disable Particles", "particles", 70)
+local antiLagToggle = createToggleSwitch(contentFrame, "Anti-Lag", "antiLag", 130)
+local desyncToggle = createToggleSwitch(contentFrame, "Desync Fix", "desyncFix", 190)
+local memoryToggle = createToggleSwitch(contentFrame, "Memory Cleanup", "memoryCleanup", 250)
 
 -- FPS COUNTER (Floating Button at Top Left)
 local fpsGui = Instance.new("ScreenGui")
@@ -287,5 +296,5 @@ runService.Heartbeat:Connect(function()
 end)
 
 print("✓ FPS Optimizer Loaded!")
-print("✓ Individual toggles available")
+print("✓ Toggle switches available")
 print("✓ FPS Counter at top left")
