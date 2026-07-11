@@ -1,4 +1,5 @@
-    --[[
+ 
+--[[
     AKAI-X-DKAY - Server Tuner v1.2
     Re-designed UI & Optimization Framework
 --]]
@@ -329,7 +330,12 @@ end)
 
 task.spawn(function()
     while task.wait(1) do
-        local connectionPing = math.round(player:GetNetworkPing() * 1000)
+        -- Safe network ping system setup
+        local connectionPing = 0
+        pcall(function()
+            connectionPing = math.round(stats.PerformanceStats.Ping:GetValue())
+        end)
+        
         fpsLabel.Text = "FPS: <font color='#4ce4e6'>" .. fpsCount .. "</font>"
         fpsLabel.RichText = true
         pingLabel.Text = "PING: <font color='#4ce4e6'>" .. connectionPing .. " ms</font>"
