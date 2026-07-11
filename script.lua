@@ -1,6 +1,7 @@
+
 --[[
-    AKAI-X-DKAY - Server Tuner v1.4
-    Enhanced Window Controls (Close, Minimize & Custom GitHub Icon)
+    AKAI-X-DKAY - Server Tuner v1.5
+    Fixed Image Formatting & Scope Handling
 --]]
 
 local players = game:GetService("Players")
@@ -29,11 +30,11 @@ local toggleStates = {
     desyncFix = true,    
     memoryCleanup = true,
     fpsOverlay = false,
-    
+
     -- Desync Panel States
     packetThrottling = false,
     pingStabilizer = false,
-    
+
     -- Settings Panel States
     autoRun = true,
     uiShadows = true
@@ -76,27 +77,27 @@ local function optimizeLighting()
         safeboxSetFFlag("FFlagDisableMaterials", true)
         safeboxSetFFlag("DFIntGraphicsQualityLevel", 1)
         safeboxSetFFlag("FFlagGraphicsSkipLODCheck", true)
-        
+
         lighting.GlobalShadows = false
         lighting.ShadowSoftness = 0
         lighting.EnvironmentBlendParameter = 0
         lighting.Decoration = false
-        
+
         if lighting:FindFirstChild("Atmosphere") then lighting.Atmosphere:Destroy() end
-        
+
         for _, fx in ipairs(lighting:GetChildren()) do
             if fx:IsA("BlurEffect") or fx:IsA("SunRaysEffect") or fx:IsA("BloomEffect") or fx:IsA("DepthOfFieldEffect") then
                 fx.Enabled = false
             end
         end
-        
+
         if terrain then
             terrain.WaterWaveSize = 0
             terrain.WaterWaveSpeed = 0
             terrain.WaterReflectance = 0
             terrain.WaterTransparency = 0
         end
-        
+
         task.spawn(function()
             local count = 0
             for _, child in ipairs(workspace:GetDescendants()) do
@@ -119,7 +120,7 @@ local function cleanEffects()
     if not toggleStates.particles then
         safeboxSetFFlag("FFlagDisableParticles", true)
         safeboxSetFFlag("FFlagDisableEffects", true)
-        
+
         for _, desc in ipairs(workspace:GetDescendants()) do
             if desc:IsA("ParticleEmitter") or desc:IsA("Smoke") or desc:IsA("Fire") or desc:IsA("Sparkles") or desc:IsA("Beam") or desc:IsA("Trail") then
                 desc.Enabled = false
@@ -137,7 +138,7 @@ task.spawn(function()
             else
                 safeboxSetFFlag("DFIntTaskSchedulerTargetFps", 999)
             end
-            
+
             safeboxSetFFlag("FFlagSmoothScheduler", true)
             safeboxSetFFlag("DFFlagThreadedSteppedFix", true)
             safeboxSetFFlag("FFlagDebugReportPhysicsErrors", false)
@@ -148,16 +149,16 @@ task.spawn(function()
                         obj:Destroy()
                     end
                 end
-                
+
                 pcall(function()
                     settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
                     settings().Rendering.MeshCacheSize = 256
                 end)
-                
+
                 debug.setmemorylimit(1024 * 1024 * 1024) 
                 print("[Akai-X-Dkay] Cleaned local memory registers & geometric caches.")
             end
-            
+
             if toggleStates.pingStabilizer or toggleStates.packetThrottling then
                 safeboxSetFFlag("FFlagThrottleUnreliablePackets", true)
                 safeboxSetFFlag("DFFlagFixPingSpikes", true)
@@ -167,10 +168,10 @@ task.spawn(function()
                 pcall(function()
                     local networkSettings = settings().Network
                     local baseSettings = settings()
-                    
+
                     networkSettings.IncomingReplicationLag = 0
                     networkSettings.PhysicsSendRate = 20
-                    
+
                     if baseSettings.Diagnostics then
                         baseSettings.Diagnostics.LuaRamLimit = 0
                     end
@@ -206,54 +207,33 @@ hudLabel.Visible = false
 hudLabel.Parent = hudGui
 
 --------------------------------------------------------------------------------
--- UI CONSTRUCTION & RESTORE BADGE MATRIX (WITH GITHUB IMAGE SCRAPER)
+-- UI CONSTRUCTION & RESTORE BADGE MATRIX
 --------------------------------------------------------------------------------
 local gui = Instance.new("ScreenGui")
 gui.Name = "AkaiXDkayServerTuner"
 gui.ResetOnSpawn = false
 gui.Parent = playerGui
 
--- Secure Download Pipeline for your Custom GitHub Attachment Image
-local iconWebURL = "https://github.com/user-attachments/assets/03eb56a0-21d7-4c36-ab83-1a421287e3be"
-local localAssetPath = "AkaiCustomBadgeIcon.png"
-
-pcall(function()
-    if writefile and getcustomasset then
-        local success, imageData = pcall(function() return game:HttpGet(iconWebURL) end)
-        if success and imageData then
-            writefile(localAssetPath, imageData)
-        end
-    end
-end)
-
--- Floating Restore Circle Badge (Upgraded to ImageButton)
+-- Floating Restore Circle Badge (Native Asset Integration Fixed)
 local restoreCircle = Instance.new("ImageButton")
 restoreCircle.Name = "RestoreBadge"
 restoreCircle.Size = UDim2.new(0, 55, 0, 55)
 restoreCircle.Position = UDim2.new(0.05, 0, 0.2, 0)
-restoreCircle.BackgroundColor3 = Color3.fromRGB(20, 25, 35) -- Matches panel theme
+restoreCircle.BackgroundColor3 = Color3.fromRGB(20, 25, 35) 
+restoreCircle.Image = "rbxassetid://10848301131" 
+restoreCircle.ImageColor3 = Color3.fromRGB(255, 76, 76) 
+restoreCircle.ScaleType = Enum.ScaleType.Fit
 restoreCircle.Visible = false
 restoreCircle.Active = true
 restoreCircle.Draggable = true
 restoreCircle.Parent = gui
-
--- Dynamic asset checking
-if getcustomasset and pcall(function() getcustomasset(localAssetPath) end) then
-    restoreCircle.Image = getcustomasset(localAssetPath)
-else
-    -- Fallback classic high-tech backup icon if download features are locked
-    restoreCircle.Image = "rbxassetid://10848301131"
-end
-
-restoreCircle.ImageColor3 = Color3.fromRGB(255, 255, 255)
-restoreCircle.ScaleType = Enum.ScaleType.Fit
 
 local badgeCorner = Instance.new("UICorner")
 badgeCorner.CornerRadius = UDim.new(1, 0)
 badgeCorner.Parent = restoreCircle
 
 local badgeStroke = Instance.new("UIStroke")
-badgeStroke.Color = Color3.fromRGB(255, 76, 76) -- Red accent line edge
+badgeStroke.Color = Color3.fromRGB(255, 76, 76) 
 badgeStroke.Thickness = 2
 badgeStroke.Parent = restoreCircle
 
@@ -281,7 +261,7 @@ local headerText = Instance.new("TextLabel")
 headerText.Size = UDim2.new(0, 350, 0, 30)
 headerText.Position = UDim2.new(0, 20, 0, 10)
 headerText.BackgroundTransparency = 1
-headerText.Text = "⚡ <font color='#ff4c4c'>AKAI-X-DKAY</font> - Server Tuner v1.4"
+headerText.Text = "⚡ <font color='#ff4c4c'>AKAI-X-DKAY</font> - Server Tuner v1.5"
 headerText.RichText = true
 headerText.TextSize = 14
 headerText.Font = Enum.Font.GothamBold
@@ -347,7 +327,7 @@ local function generatePanel(name, isDefault)
     panel.CanvasSize = UDim2.new(0, 0, 0, 400)
     panel.ScrollBarThickness = 2
     panel.Parent = mainFrame
-    
+
     local layout = Instance.new("UIListLayout")
     layout.Padding = UDim.new(0, 10)
     layout.Parent = panel
@@ -370,11 +350,11 @@ local function createTabButton(name, iconText, targetPanel, startActive)
     btn.TextSize = 10
     btn.TextColor3 = startActive and Color3.fromRGB(255, 76, 76) or Color3.fromRGB(110, 125, 150)
     btn.Parent = sidebar
-    
+
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 6)
     corner.Parent = btn
-    
+
     local activeInd = Instance.new("Frame")
     activeInd.Size = UDim2.new(0, 4, 1, 0)
     activeInd.BackgroundColor3 = Color3.fromRGB(255, 76, 76)
@@ -390,7 +370,7 @@ local function createTabButton(name, iconText, targetPanel, startActive)
         desyncPanel.Visible = false
         settingsPanel.Visible = false
         targetPanel.Visible = true
-        
+
         for _, child in ipairs(sidebar:GetChildren()) do
             if child:IsA("TextButton") then
                 child.BackgroundTransparency = 1
@@ -448,12 +428,12 @@ task.spawn(function()
         pcall(function()
             connectionPing = math.round(stats.PerformanceStats.Ping:GetValue())
         end)
-        
+
         fpsLabel.Text = "FPS: <font color='#4ce4e6'>" .. fpsCount .. "</font>"
         fpsLabel.RichText = true
         pingLabel.Text = "PING: <font color='#4ce4e6'>" .. connectionPing .. " ms</font>"
         pingLabel.RichText = true
-        
+
         if toggleStates.fpsOverlay then
             hudLabel.Text = fpsCount .. " FPS"
         end
@@ -511,7 +491,7 @@ local function buildGuiToggle(container, stateKey, title, switchBg, switchKnob, 
     actionBtn.MouseButton1Click:Connect(function()
         if toggleStates[stateKey] ~= nil then
             toggleStates[stateKey] = not toggleStates[stateKey]
-            
+
             if toggleStates[stateKey] then
                 label.Text = title .. " <font color='#ff4c4c'>(ON)</font>"
                 tweenService:Create(switchBg, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 76, 76)}):Play()
@@ -579,6 +559,7 @@ local function createToggleRow(title, desc, stateKey, parentPanel)
 
     buildGuiToggle(container, stateKey, title, switchBg, switchKnob, label)
 end
+
 --------------------------------------------------------------------------------
 -- GENERATE INITIAL CONTENT DOMAIN MAP
 --------------------------------------------------------------------------------
