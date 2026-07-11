@@ -1,4 +1,3 @@
- 
 --[[
     AKAI-X-DKAY - Server Tuner v1.2
     Re-designed UI & Optimization Framework
@@ -53,10 +52,24 @@ local function safeboxSetFFlag(flagName, value)
 end
 
 --------------------------------------------------------------------------------
--- ADVANCED ENGINE INTERPOLATION BACKEND
+-- ADVANCED ENGINE INTERPOLATION & GRAPHICS OPTIMIZER
 --------------------------------------------------------------------------------
 
--- 1. Graphics, Materials, & Shadows Optimizer
+local function optimizeVisuals(obj)
+    if not toggleStates.graphics then
+        if obj:IsA("BasePart") then
+            obj.Material = Enum.Material.SmoothPlastic
+            obj.CastShadow = false
+            obj.Reflectance = 0
+        elseif obj:IsA("MeshPart") then
+            obj.CastShadow = false
+            obj.CollisionFidelity = Enum.CollisionFidelity.Box
+        elseif obj:IsA("Decal") or obj:IsA("Texture") then
+            obj.Transparency = 1 
+        end
+    end
+end
+
 local function optimizeLighting()
     if not toggleStates.graphics then
         safeboxSetFFlag("FFlagDisableShadows", true)
@@ -65,8 +78,17 @@ local function optimizeLighting()
         safeboxSetFFlag("FFlagGraphicsSkipLODCheck", true)
         
         lighting.GlobalShadows = false
+        lighting.ShadowSoftness = 0
+        lighting.EnvironmentBlendParameter = 0
         lighting.Decoration = false
+        
         if lighting:FindFirstChild("Atmosphere") then lighting.Atmosphere:Destroy() end
+        
+        for _, fx in ipairs(lighting:GetChildren()) do
+            if fx:IsA("BlurEffect") or fx:IsA("SunRaysEffect") or fx:IsA("BloomEffect") or fx:IsA("DepthOfFieldEffect") then
+                fx.Enabled = false
+            end
+        end
         
         if terrain then
             terrain.WaterWaveSize = 0
@@ -75,18 +97,17 @@ local function optimizeLighting()
             terrain.WaterTransparency = 0
         end
         
-        for _, obj in ipairs(workspace:GetDescendants()) do
-            if obj:IsA("BasePart") then
-                obj.Material = Enum.Material.SmoothPlastic
-                obj.CastShadow = false
-            end
+        for _, child in ipairs(workspace:GetDescendants()) do
+            optimizeVisuals(child)
         end
+        print("[Akai-X-Dkay] Graphics & Rendering optimized.")
     else
         lighting.GlobalShadows = true
     end
 end
 
--- 2. Particle & Effect Cleaner
+workspace.DescendantAdded:Connect(optimizeVisuals)
+
 local function cleanEffects()
     if not toggleStates.particles then
         safeboxSetFFlag("FFlagDisableParticles", true)
@@ -100,41 +121,65 @@ local function cleanEffects()
     end
 end
 
--- 3. Live FFlag Injector & Core Network Loop
+-- Core Engine Network/Optimization & Garbage Collector Loop
 task.spawn(function()
     while task.wait(3) do
         if masterLagReduction then
             
+            -- Uncap frame cycles (Forces extreme game loop responsiveness up to 999 FPS)
             local setfpscapFunc = setfpscap or set_fps_cap
             if setfpscapFunc then
-                setfpscapFunc(240)
+                setfpscapFunc(999)
             else
-                safeboxSetFFlag("DFIntTaskSchedulerTargetFps", 240)
+                safeboxSetFFlag("DFIntTaskSchedulerTargetFps", 999)
             end
             
             safeboxSetFFlag("FFlagSmoothScheduler", true)
             safeboxSetFFlag("DFFlagThreadedSteppedFix", true)
             safeboxSetFFlag("FFlagDebugReportPhysicsErrors", false)
 
-            -- Memory Cleanup Engine
+            -- Garbage Collection Engine & RAM Leak Sweeper
             if toggleStates.memoryCleanup then
                 for _, obj in ipairs(workspace:GetDescendants()) do
                     if obj:IsA("Explosion") or obj:IsA("ShirtGraphic") then
                         obj:Destroy()
                     end
                 end
+                
+                -- Dynamic Environment Safety Wrappers (Replaces crashing global allocations)
+                pcall(function()
+                    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+                    settings().Rendering.MeshCacheSize = 256
+                end)
+                
                 debug.setmemorylimit(1024 * 1024 * 1024) 
+                print("[Akai-X-Dkay] Cleaned local memory registers & geometric caches.")
             end
             
-            -- Network Buffers
-            if toggleStates.packetThrottling then
+            -- Network & Ping Stabilizer Logic
+            if toggleStates.pingStabilizer or toggleStates.packetThrottling then
                 safeboxSetFFlag("FFlagThrottleUnreliablePackets", true)
                 safeboxSetFFlag("DFFlagFixPingSpikes", true)
                 safeboxSetFFlag("DFIntNetworkMinSendInterval", 15)
-            end
-            
-            if toggleStates.pingStabilizer then
                 safeboxSetFFlag("FFlagNetworkUseNewTransport", true)
+
+                pcall(function()
+                    local networkSettings = settings().Network
+                    local baseSettings = settings()
+                    
+                    networkSettings.IncomingReplicationLag = 0
+                    networkSettings.PhysicsSendRate = 20
+                    
+                    if baseSettings.Diagnostics then
+                        baseSettings.Diagnostics.LuaRamLimit = 0
+                    end
+                end)
+
+                if terrain then
+                    terrain.WaterWaveSize = 0
+                    terrain.WaterWaveSpeed = 0
+                end
+                print("[Akai-X-Dkay] Network, allocation pipelines, and replication profiles maximized.")
             end
         end
     end
@@ -330,7 +375,6 @@ end)
 
 task.spawn(function()
     while task.wait(1) do
-        -- Safe network ping system setup
         local connectionPing = 0
         pcall(function()
             connectionPing = math.round(stats.PerformanceStats.Ping:GetValue())
@@ -470,18 +514,4 @@ end
 --------------------------------------------------------------------------------
 -- GENERATE INITIAL CONTENT DOMAIN MAP
 --------------------------------------------------------------------------------
-createToggleRow("FPS OVERLAY", "Pins pure black FPS tracking onto your left viewport edge", "fpsOverlay", statusPanel)
-
-createSliderRow("MANUAL RENDER RANGE", "Scales engine chunk rendering algorithms", optimizationPanel)
-createToggleRow("TEXTURE COMPRESSION", "Forces global asset models into fast configurations", "graphics", optimizationPanel)
-
-createToggleRow("LIGHTING TUNER", "Lowers heavy engines & dynamic shadows", "graphics", antiLagPanel)
-createToggleRow("PARTICLE OPTIMIZER", "Limits intense engine visual effects & smoke", "particles", antiLagPanel)
-createToggleRow("DE-SYNC ANTI-LAG", "Optimizes internal frame caching network loops", "antiLag", antiLagPanel)
-createToggleRow("MEMORY CLEANUP", "Automatically flushes garbage collections", "memoryCleanup", antiLagPanel)
-
-createToggleRow("PACKET THROTTLING", "Throttles unreliability buffers to prevent data spikes", "packetThrottling", desyncPanel)
-createToggleRow("PING STABILIZER", "Forces safe internal transport layers to smooth ping gaps", "pingStabilizer", desyncPanel)
-
-createToggleRow("AUTOMATIC RUNTIME", "Executes optimizations silently upon player spawn cycles", "autoRun", settingsPanel)
-createToggleRow("INTERFACE SHADOWS", "Toggles backend borders to lower rendering drawcalls", "uiShadows", settingsPanel)
+createToggleRow("FPS OVERLAY", "Pins pure bla
