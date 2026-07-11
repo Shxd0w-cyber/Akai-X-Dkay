@@ -11,6 +11,7 @@ local tweenService = game:GetService("TweenService")
 local lighting = game:GetService("Lighting")
 local workspace = game:GetService("Workspace")
 local stats = game:GetService("Stats")
+local terrain = workspace:FindFirstChildOfClass("Terrain")
 
 --------------------------------------------------------------------------------
 -- ANTI-OVERLAP & CLEANUP
@@ -28,9 +29,11 @@ local toggleStates = {
     desyncFix = true,    
     memoryCleanup = true,
     fpsOverlay = false,
-    -- Desync Panel States
+    
+    -- Desync Panel States (Dynamic mapping directly to your FastFlags)
     packetThrottling = false,
     pingStabilizer = false,
+    
     -- Settings Panel States
     autoRun = true,
     uiShadows = true
@@ -38,46 +41,115 @@ local toggleStates = {
 
 local renderDistanceValue = 200
 
+-- Safe wrapper logic to apply FFlags natively if supported by executor environment
+local function safeboxSetFFlag(flagName, value)
+    local setfflagFunc = setfflag or set_fflag or (syn and syn.set_fflag)
+    if setfflagFunc then
+        pcall(function()
+            setfflagFunc(flagName, tostring(value))
+        end)
+    end
+end
+
 --------------------------------------------------------------------------------
--- PERFORMANCE OPTIMIZATION BACKEND
+-- ADVANCED ENGINE INTERPOLATION BACKEND (REAL PERFORMANCE OVERRIDE)
 --------------------------------------------------------------------------------
+
+-- 1. Graphics, Materials, & Shadows Optimizer (FFlagDisableShadows/FFlagDisableMaterials)
 local function optimizeLighting()
     if not toggleStates.graphics then
+        -- Native Engine Overrides
+        safeboxSetFFlag("FFlagDisableShadows", true)
+        safeboxSetFFlag("FFlagDisableMaterials", true)
+        safeboxSetFFlag("DFIntGraphicsQualityLevel", 1)
+        safeboxSetFFlag("FFlagGraphicsSkipLODCheck", true)
+        
+        -- Standard Luau Fallback Updates
         lighting.GlobalShadows = false
         lighting.Decoration = false
         if lighting:FindFirstChild("Atmosphere") then lighting.Atmosphere:Destroy() end
+        
+        if terrain then
+            terrain.WaterWaveSize = 0
+            terrain.WaterWaveSpeed = 0
+            terrain.WaterReflectance = 0
+            terrain.WaterTransparency = 0
+        end
+        
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") then
+                obj.Material = Enum.Material.SmoothPlastic
+                obj.CastShadow = false
+            end
+        end
     else
         lighting.GlobalShadows = true
     end
 end
 
+-- 2. Particle & Effect Cleaner (FFlagDisableParticles & FFlagDisableEffects)
 local function cleanEffects()
     if not toggleStates.particles then
+        safeboxSetFFlag("FFlagDisableParticles", true)
+        safeboxSetFFlag("FFlagDisableEffects", true)
+        
         for _, desc in ipairs(workspace:GetDescendants()) do
-            if desc:IsA("ParticleEmitter") or desc:IsA("Smoke") or desc:IsA("Fire") or desc:IsA("Sparkles") then
+            if desc:IsA("ParticleEmitter") or desc:IsA("Smoke") or desc:IsA("Fire") or desc:IsA("Sparkles") or desc:IsA("Beam") or desc:IsA("Trail") then
                 desc.Enabled = false
             end
         end
     end
 end
 
+-- 3. Live FFlag Injector & Core Network Performance Loop
 task.spawn(function()
-    while task.wait(5) do
-        if masterLagReduction and toggleStates.memoryCleanup then
-            for _, obj in ipairs(workspace:GetDescendants()) do
-                if obj:IsA("Explosion") then
-                    obj:Destroy()
-                elseif obj:IsA("BasePart") and not toggleStates.graphics then
-                    obj.Material = Enum.Material.SmoothPlastic
-                end
+    while task.wait(3) do
+        if masterLagReduction then
+            
+            -- Trigger your requested Frame Scheduler Flags dynamically if performance drops
+            local setfpscapFunc = setfpscap or set_fps_cap
+            if setfpscapFunc then
+                setfpscapFunc(240)
+            else
+                safeboxSetFFlag("DFIntTaskSchedulerTargetFps", 240)
             end
-            debug.setmemorylimit(1024 * 1024 * 1024) 
+            
+            safeboxSetFFlag("FFlagSmoothScheduler", true)
+            safeboxSetFFlag("DFFlagThreadedSteppedFix", true)
+            safeboxSetFFlag("FFlagDebugReportPhysicsErrors", false)
+
+            -- Memory Cleanup Engine
+            if toggleStates.memoryCleanup then
+                for _, obj in ipairs(workspace:GetDescendants()) do
+                    if obj:IsA("Explosion") or obj:IsA("ShirtGraphic") then
+                        obj:Destroy()
+                    end
+                end
+                debug.setmemorylimit(1024 * 1024 * 1024) 
+            end
+            
+            -- Network Packet Throttling Engine (FFlagThrottleUnreliablePackets / DFFlagFixPingSpikes)
+            if toggleStates.packetThrottling then
+                safeboxSetFFlag("FFlagThrottleUnreliablePackets", true)
+                safeboxSetFFlag("DFFlagFixPingSpikes", true)
+                safeboxSetFFlag("DFIntNetworkMinSendInterval", 15)
+                
+                settings().Network.IncomingReplicationLag = 0
+            end
+            
+            -- Ping Stabilizer Engine (FFlagNetworkUseNewTransport / Threaded Fixes)
+            if toggleStates.pingStabilizer then
+                safeboxSetFFlag("FFlagNetworkUseNewTransport", true)
+                settings().Network.DataSendRate = 60
+            else
+                settings().Network.DataSendRate = 30
+            end
         end
     end
 end)
 
 --------------------------------------------------------------------------------
--- PERSISTENT HUD OVERLAY (Stays visible even when UI closes)
+-- PERSISTENT HUD OVERLAY
 --------------------------------------------------------------------------------
 local hudGui = Instance.new("ScreenGui")
 hudGui.Name = "AkaiXPersistentHUD"
@@ -146,7 +218,7 @@ closeBtn.Parent = mainFrame
 closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
 
 --------------------------------------------------------------------------------
--- PANELS AND INTERFACE TABS (ALL WORKING)
+-- PANELS AND INTERFACE TABS
 --------------------------------------------------------------------------------
 local sidebar = Instance.new("Frame")
 sidebar.Size = UDim2.new(0, 140, 1, -60)
@@ -158,7 +230,6 @@ local tabLayout = Instance.new("UIListLayout")
 tabLayout.Padding = UDim.new(0, 8)
 tabLayout.Parent = sidebar
 
--- Container Panel Factories
 local function generatePanel(name, isDefault)
     local panel = Instance.new("ScrollingFrame")
     panel.Name = name .. "Panel"
@@ -178,7 +249,7 @@ end
 
 local statusPanel = generatePanel("Status", false)
 local optimizationPanel = generatePanel("Optimization", false)
-local antiLagPanel = generatePanel("AntiLag", true) -- Default Initial Panel
+local antiLagPanel = generatePanel("AntiLag", true) 
 local desyncPanel = generatePanel("Desync", false)
 local settingsPanel = generatePanel("Settings", false)
 
@@ -234,7 +305,7 @@ createTabButton("DESYNC", "⇄", desyncPanel, false)
 createTabButton("SETTINGS", "⚙️", settingsPanel, false)
 
 --------------------------------------------------------------------------------
--- STATUS RENDERING ENGINE
+-- STATUS METRIC RENDERING ENGINE
 --------------------------------------------------------------------------------
 local function createStatDisplay(title, initialValue, parent)
     local frame = Instance.new("Frame")
@@ -260,7 +331,6 @@ end
 local fpsLabel = createStatDisplay("FPS", "Calculating...", statusPanel)
 local pingLabel = createStatDisplay("PING", "Calculating...", statusPanel)
 
--- Live Metric Calculation Tracking Loop
 local fpsCount = 0
 runService.RenderStepped:Connect(function()
     fpsCount = fpsCount + 1
@@ -282,7 +352,7 @@ task.spawn(function()
 end)
 
 --------------------------------------------------------------------------------
--- SLIDER ELEMENT FACTORY (For Optimization Tab Hierarchy)
+-- SLIDER ROUTING FRAMEWORK
 --------------------------------------------------------------------------------
 local function createSliderRow(title, desc, parentPanel)
     local container = Instance.new("Frame")
@@ -316,10 +386,16 @@ local function createSliderRow(title, desc, parentPanel)
     fill.BackgroundColor3 = Color3.fromRGB(255, 76, 76)
     fill.Parent = slideBar
     Instance.new("UICorner", fill)
+    
+    runService.RenderStepped:Connect(function()
+        if not toggleStates.graphics then
+            settings().Rendering.DrawDistanceMax = renderDistanceValue
+        end
+    end)
 end
 
 --------------------------------------------------------------------------------
--- COMPACT INTERACTIVE TOGGLE GENERATOR
+-- MASTER COMPACT TOGGLE LOGIC CONSTRUCTOR
 --------------------------------------------------------------------------------
 local function buildGuiToggle(container, stateKey, title, switchBg, switchKnob, label)
     local actionBtn = Instance.new("TextButton")
@@ -403,26 +479,18 @@ end
 --------------------------------------------------------------------------------
 -- GENERATE INITIAL CONTENT DOMAIN MAP
 --------------------------------------------------------------------------------
--- STATUS CONTROL SUITE
 createToggleRow("FPS OVERLAY", "Pins pure black FPS tracking onto your left viewport edge", "fpsOverlay", statusPanel)
 
--- OPTIMIZATION CONTROL SUITE
 createSliderRow("MANUAL RENDER RANGE", "Scales engine chunk rendering algorithms", optimizationPanel)
 createToggleRow("TEXTURE COMPRESSION", "Forces global asset models into fast configurations", "graphics", optimizationPanel)
 
--- ANTI-LAG MATRIX CONFIGURATION
 createToggleRow("LIGHTING TUNER", "Lowers heavy engines & dynamic shadows", "graphics", antiLagPanel)
 createToggleRow("PARTICLE OPTIMIZER", "Limits intense engine visual effects & smoke", "particles", antiLagPanel)
 createToggleRow("DE-SYNC ANTI-LAG", "Optimizes internal frame caching network loops", "antiLag", antiLagPanel)
 createToggleRow("MEMORY CLEANUP", "Automatically flushes garbage collections", "memoryCleanup", antiLagPanel)
 
--- DESYNC ROUTING MATRIX
-createToggleRow("PACKET THROTTLING", "Prevents inbound bandwidth network drops", "packetThrottling", desyncPanel)
-createToggleRow("PING STABILIZER", "Smoothes out erratic latency shifts under heavy load", "pingStabilizer", desyncPanel)
+-- Desync Tab: Custom Mapped via provided FastFlags optimizations
+createToggleRow("PACKET THROTTLING", "Throttles unreliability buffers to prevent data spikes", "packetThrottling", desyncPanel)
+createToggleRow("PING STABILIZER", "Forces safe internal transport layers to smooth ping gaps", "pingStabilizer", desyncPanel)
 
--- SYSTEM SETTINGS SUITE
-createToggleRow("AUTOMATIC RUNTIME", "Executes optimizations silently upon player spawn cycles", "autoRun", settingsPanel)
-createToggleRow("INTERFACE SHADOWS", "Toggles backend borders to lower rendering drawcalls", "uiShadows", settingsPanel)
-
-
- 
+createToggleRow("AUTOMATIC RUNTIME", "Executes optimizations silently upon player
