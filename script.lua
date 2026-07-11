@@ -4,6 +4,9 @@ local player = players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 local runService = game:GetService("RunService")
 
+-- Toggle state
+local optimizationsEnabled = true
+
 -- Create ScreenGui
 local gui = Instance.new("ScreenGui")
 gui.Name = "OptimizationGui"
@@ -13,8 +16,8 @@ gui.Parent = playerGui
 -- Create main frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 500, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
+mainFrame.Size = UDim2.new(0, 500, 0, 450)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -225)
 mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 mainFrame.BorderSizePixel = 2
 mainFrame.BorderColor3 = Color3.fromRGB(0, 255, 100)
@@ -82,7 +85,7 @@ statusLabel.Parent = contentFrame
 -- Optimization info
 local infoLabel = Instance.new("TextLabel")
 infoLabel.Name = "InfoLabel"
-infoLabel.Size = UDim2.new(1, -20, 1, -60)
+infoLabel.Size = UDim2.new(1, -20, 1, -120)
 infoLabel.Position = UDim2.new(0, 10, 0, 50)
 infoLabel.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
 infoLabel.BorderColor3 = Color3.fromRGB(0, 200, 80)
@@ -94,6 +97,37 @@ infoLabel.TextWrapped = true
 infoLabel.TextYAlignment = Enum.TextYAlignment.Top
 infoLabel.Text = "Loading optimizations..."
 infoLabel.Parent = contentFrame
+
+-- TOGGLE BUTTON
+local toggleButton = Instance.new("TextButton")
+toggleButton.Name = "ToggleBtn"
+toggleButton.Size = UDim2.new(0, 150, 0, 40)
+toggleButton.Position = UDim2.new(0.5, -75, 1, -50)
+toggleButton.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.TextSize = 16
+toggleButton.Font = Enum.Font.GothamBold
+toggleButton.Text = "✓ ON"
+toggleButton.BorderSizePixel = 0
+toggleButton.Parent = contentFrame
+
+toggleButton.MouseButton1Click:Connect(function()
+    optimizationsEnabled = not optimizationsEnabled
+    
+    if optimizationsEnabled then
+        toggleButton.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+        toggleButton.Text = "✓ ON"
+        statusLabel.Text = "✓ Optimizations ON"
+        statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+        print("✓ Optimizations ENABLED")
+    else
+        toggleButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        toggleButton.Text = "✗ OFF"
+        statusLabel.Text = "✗ Optimizations OFF"
+        statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        print("✗ Optimizations DISABLED")
+    end
+end)
 
 -- FPS COUNTER (Floating Button at Top Left)
 local fpsGui = Instance.new("ScreenGui")
@@ -131,36 +165,62 @@ runService.RenderStepped:Connect(function()
     end
 end)
 
--- FPS BOOST
-print("Starting FPS optimizations...")
+-- FPS BOOST FUNCTION
+local function enableOptimizations()
+    game.Lighting.GlobalShadows = false
+    game.Lighting.Brightness = 2
 
-game.Lighting.GlobalShadows = false
-game.Lighting.Brightness = 2
+    pcall(function()
+        settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+    end)
 
-pcall(function()
-    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-end)
+    pcall(function()
+        game.Lighting.Fog.FogEnd = 500
+    end)
 
-pcall(function()
-    game.Lighting.Fog.FogEnd = 500
-end)
-
--- Disable particles
-local function disableEffects()
-    for _, v in ipairs(workspace:GetDescendants()) do
-        if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") then
-            pcall(function() v.Enabled = false end)
+    local function disableEffects()
+        for _, v in ipairs(workspace:GetDescendants()) do
+            if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") then
+                pcall(function() v.Enabled = false end)
+            end
         end
     end
+
+    disableEffects()
 end
 
-disableEffects()
+-- DISABLE OPTIMIZATIONS FUNCTION
+local function disableOptimizations()
+    game.Lighting.GlobalShadows = true
+    game.Lighting.Brightness = 1
+
+    pcall(function()
+        settings().Rendering.QualityLevel = Enum.QualityLevel.Automatic
+    end)
+
+    pcall(function()
+        game.Lighting.Fog.FogEnd = 100000
+    end)
+
+    local function enableEffects()
+        for _, v in ipairs(workspace:GetDescendants()) do
+            if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") then
+                pcall(function() v.Enabled = true end)
+            end
+        end
+    end
+
+    enableEffects()
+end
+
+print("Starting FPS optimizations...")
+enableOptimizations()
 
 -- ANTI-LAG
 local antiLagEnabled = true
 
 runService.Heartbeat:Connect(function()
-    if antiLagEnabled then
+    if antiLagEnabled and optimizationsEnabled then
         for _, v in ipairs(workspace:GetDescendants()) do
             if v:IsA("BasePart") then
                 if v.CanCollide == false and v.Transparency == 1 and #v:GetChildren() == 0 then
@@ -177,7 +237,7 @@ pcall(function()
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
     
     runService.Heartbeat:Connect(function()
-        if humanoidRootPart then
+        if humanoidRootPart and optimizationsEnabled then
             pcall(function()
                 humanoidRootPart.CanCollide = true
             end)
@@ -188,7 +248,7 @@ end)
 -- ANTI-FREEZE (Memory Management)
 local lastMemoryClear = tick()
 runService.Heartbeat:Connect(function()
-    if tick() - lastMemoryClear > 30 then
+    if tick() - lastMemoryClear > 30 and optimizationsEnabled then
         pcall(function()
             collectgarbage("collect")
         end)
@@ -220,4 +280,4 @@ statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
 statusLabel.Text = "✓ All Optimizations Active!"
 
 print("✓ FPS Optimizer Loaded!")
-print("✓ FPS Counter at top left")
+print("✓ Toggle button available in GUI")
