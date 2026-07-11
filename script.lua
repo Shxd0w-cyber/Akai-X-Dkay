@@ -536,4 +536,46 @@ local function createToggleRow(title, desc, stateKey, parentPanel)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, -10, 0, 55)
     container.BackgroundColor3 = Color3.fromRGB(18, 22, 32)
-    contain
+    container.Parent = parentPanel
+    Instance.new("UICorner", container).CornerRadius = UDim.new(0, 6)
+    Instance.new("UIStroke", container).Color = Color3.fromRGB(28, 35, 50)
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -100, 0, 20)
+    label.Position = UDim2.new(0, 65, 0, 8)
+    label.BackgroundTransparency = 1
+    label.Text = title .. (toggleStates[stateKey] and " <font color='#ff4c4c'>(ON)</font>" or " <font color='#78879b'>(OFF)</font>")
+    label.RichText = true
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 12
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = container
+
+    local descLabel = Instance.new("TextLabel")
+    descLabel.Size = UDim2.new(1, -100, 0, 20)
+    descLabel.Position = UDim2.new(0, 65, 0, 26)
+    descLabel.BackgroundTransparency = 1
+    descLabel.Text = desc
+    descLabel.TextColor3 = Color3.fromRGB(120, 135, 155)
+    descLabel.Font = Enum.Font.Gotham
+    descLabel.TextSize = 10
+    descLabel.TextXAlignment = Enum.TextXAlignment.Left
+    descLabel.Parent = container
+
+    local switchBg = Instance.new("Frame")
+    switchBg.Size = UDim2.new(0, 42, 0, 22)
+    switchBg.Position = UDim2.new(0, 12, 0.5, -11)
+    switchBg.BackgroundColor3 = toggleStates[stateKey] and Color3.fromRGB(255, 76, 76) or Color3.fromRGB(40, 48, 68)
+    switchBg.Parent = container
+    Instance.new("UICorner", switchBg).CornerRadius = UDim.new(1, 0)
+
+    local switchKnob = Instance.new("Frame")
+    switchKnob.Size = UDim2.new(0, 16, 0, 16)
+    switchKnob.Position = toggleStates[stateKey] and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8)
+    switchKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    switchKnob.Parent = switchBg
+    Instance.new("UICorner", switchKnob).CornerRadius = UDim.new(1, 0)
+
+    buildGuiToggle(container, stateKey, title, switchBg, switchKnob, label)
+end
