@@ -38,7 +38,6 @@ titleText.TextSize = 18
 titleText.Font = Enum.Font.GothamBold
 titleText.Text = "⚡ FPS Optimizer"
 titleText.TextXAlignment = Enum.TextXAlignment.Left
-titleText.TextIndent = 15
 titleText.Parent = titleBar
 
 -- Close button
@@ -94,7 +93,6 @@ infoLabel.Font = Enum.Font.Gotham
 infoLabel.TextWrapped = true
 infoLabel.TextYAlignment = Enum.TextYAlignment.Top
 infoLabel.Text = "Loading optimizations..."
-infoLabel.TextIndent = 10
 infoLabel.Parent = contentFrame
 
 -- ============================================
