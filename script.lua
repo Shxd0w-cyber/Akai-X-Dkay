@@ -93,6 +93,40 @@ infoLabel.Text = ""
 infoLabel.Parent = contentFrame
 
 -- ============================================
+-- FPS COUNTER BUTTON (Transparent Background, Black Text)
+-- ============================================
+
+local fpsButton = Instance.new("TextButton")
+fpsButton.Name = "FPSCounter"
+fpsButton.Size = UDim2.new(0, 120, 0, 40)
+fpsButton.Position = UDim2.new(0, 10, 1, -50)
+fpsButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+fpsButton.BackgroundTransparency = 0.7  -- Transparent background
+fpsButton.TextColor3 = Color3.fromRGB(0, 0, 0)  -- Black text
+fpsButton.TextSize = 14
+fpsButton.Font = Enum.Font.GothamBold
+fpsButton.Text = "FPS: 60"
+fpsButton.BorderSizePixel = 0
+fpsButton.Parent = mainFrame
+
+-- FPS Counter Logic
+local lastUpdate = tick()
+local frameCount = 0
+local currentFPS = 0
+
+runService.RenderStepped:Connect(function()
+    frameCount = frameCount + 1
+    local currentTime = tick()
+    
+    if currentTime - lastUpdate >= 1 then
+        currentFPS = frameCount
+        fpsButton.Text = "FPS: " .. currentFPS
+        frameCount = 0
+        lastUpdate = currentTime
+    end
+end)
+
+-- ============================================
 -- FPS BOOST & OPTIMIZATION
 -- ============================================
 
@@ -199,3 +233,4 @@ statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
 
 print("✓ FPS Optimizer Loaded Successfully!")
 print("✓ All optimizations active")
+print("✓ FPS Counter Active - Check bottom left!")
