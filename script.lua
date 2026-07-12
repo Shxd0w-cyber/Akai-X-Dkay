@@ -409,3 +409,117 @@ createTabButton("OPTIMIZATION", "⚙️", optimizationPanel, false)
 createTabButton("ANTI-LAG", "⚡", antiLagPanel, true)
 createTabButton("DESYNC", "⇄", desyncPanel, false)
 createTabButton("SETTINGS", "⚙️", settingsPanel, false)
+--------------------------------------------------------------------------------
+-- MASTER COMPACT TOGGLE LOGIC CONSTRUCTOR
+--------------------------------------------------------------------------------
+local function buildGuiToggle(container, stateKey, title, switchBg, switchKnob, label)
+    local actionBtn = Instance.new("TextButton")
+    actionBtn.Size = UDim2.new(1, 0, 1, 0)
+    actionBtn.BackgroundTransparency = 1
+    actionBtn.Text = ""
+    actionBtn.Parent = container
+
+    actionBtn.MouseButton1Click:Connect(function()
+        if toggleStates[stateKey] ~= nil then
+            toggleStates[stateKey] = not toggleStates[stateKey]
+
+            if toggleStates[stateKey] then
+                label.Text = title .. " <font color='#ff4c4c'>(ON)</font>"
+                tweenService:Create(switchBg, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 76, 76)}):Play()
+                tweenService:Create(switchKnob, TweenInfo.new(0.2), {Position = UDim2.new(1, -19, 0.5, -8)}):Play()
+            else
+                label.Text = title .. " <font color='#78879b'>(OFF)</font>"
+                tweenService:Create(switchBg, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 48, 68)}):Play()
+                tweenService:Create(switchKnob, TweenInfo.new(0.2), {Position = UDim2.new(0, 3, 0.5, -8)}):Play()
+            end
+
+            if stateKey == "fpsOverlay" then
+                hudLabel.Visible = toggleStates.fpsOverlay
+            else
+                optimizeLighting()
+                cleanEffects()
+            end
+        end
+    end)
+end
+
+local function createToggleRow(title, desc, stateKey, parentPanel)
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(1, -10, 0, 55)
+    container.BackgroundColor3 = Color3.fromRGB(18, 22, 32)
+    container.Parent = parentPanel
+    Instance.new("UICorner", container).CornerRadius = UDim.new(0, 6)
+    Instance.new("UIStroke", container).Color = Color3.fromRGB(28, 35, 50)
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -100, 0, 20)
+    label.Position = UDim2.new(0, 65, 0, 8)
+    label.BackgroundTransparency = 1
+    label.Text = title .. (toggleStates[stateKey] and " <font color='#ff4c4c'>(ON)</font>" or " <font color='#78879b'>(OFF)</font>")
+    label.RichText = true
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 12
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = container
+
+    local descLabel = Instance.new("TextLabel")
+    descLabel.Size = UDim2.new(1, -100, 0, 20)
+    descLabel.Position = UDim2.new(0, 65, 0, 26)
+    descLabel.BackgroundTransparency = 1
+    descLabel.Text = desc
+    descLabel.TextColor3 = Color3.fromRGB(120, 135, 155)
+    descLabel.Font = Enum.Font.Gotham
+    descLabel.TextSize = 10
+    descLabel.TextXAlignment = Enum.TextXAlignment.Left
+    descLabel.Parent = container
+
+    local switchBg = Instance.new("Frame")
+    switchBg.Size = UDim2.new(0, 42, 0, 22)
+    switchBg.Position = UDim2.new(0, 12, 0.5, -11)
+    switchBg.BackgroundColor3 = toggleStates[stateKey] and Color3.fromRGB(255, 76, 76) or Color3.fromRGB(40, 48, 68)
+    switchBg.Parent = container
+    Instance.new("UICorner", switchBg).CornerRadius = UDim.new(1, 0)
+
+    local switchKnob = Instance.new("Frame")
+    switchKnob.Size = UDim2.new(0, 16, 0, 16)
+    switchKnob.Position = toggleStates[stateKey] and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8)
+    switchKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    switchKnob.Parent = switchBg
+    Instance.new("UICorner", switchKnob).CornerRadius = UDim.new(1, 0)
+
+    buildGuiToggle(container, stateKey, title, switchBg, switchKnob, label)
+end
+
+--------------------------------------------------------------------------------
+-- GENERATE INITIAL CONTENT DOMAIN MAP
+--------------------------------------------------------------------------------
+-- Status Panel Setup (Toggles & Upgraded 1.0 to 7.0 Sensitivity Matrix Slider)
+createToggleRow("FPS OVERLAY", "Pins pure black FPS tracking onto your left viewport edge", "fpsOverlay", statusPanel)
+createSliderRow("CAMERA SENSITIVITY", 1.0, 7.0, 1.2, true, "Adjusts dynamic pointer tracking metrics", statusPanel, function(value)
+    pcall(function()
+        local userGameSettings = UserSettings():GetService("UserGameSettings")
+        userGameSettings.MouseSensitivity = 0.396 * value
+    end)
+end)
+
+-- Optimization Panel Setup
+createSliderRow("MANUAL RENDER RANGE", 50, 1000, 200, false, "Scales engine chunk rendering algorithms", optimizationPanel, function(value)
+    renderDistanceValue = value
+end)
+createToggleRow("TEXTURE COMPRESSION", "Forces global asset models into fast configurations", "graphics", optimizationPanel)
+
+-- Anti-Lag Panel Setup
+createToggleRow("LIGHTING TUNER", "Lowers heavy engines & dynamic shadows", "graphics", antiLagPanel)
+createToggleRow("PARTICLE OPTIMIZER", "Limits intense engine visual effects & smoke", "particles", antiLagPanel)
+createToggleRow("DE-SYNC ANTI-LAG", "Optimizes internal frame caching network loops", "antiLag", antiLagPanel)
+createToggleRow("MEMORY CLEANUP", "Automatically flushes garbage collections & uncaps scheduling limits", "memoryCleanup", antiLagPanel)
+
+-- Desync Panel Setup
+createToggleRow("PACKET THROTTLING", "Throttles unreliability buffers to compress network loads", "packetThrottling", desyncPanel)
+createToggleRow("PING STABILIZER", "Optimizes physical replication send rate and packet processing lag", "pingStabilizer", desyncPanel)
+
+-- Settings Panel Setup
+createToggleRow("AUTOMATIC RUNTIME", "Executes optimizations silently upon player spawn cycles", "autoRun", settingsPanel)
+createToggleRow("INTERFACE SHADOWS", "Toggles backend borders to lower rendering drawcalls", "uiShadows", settingsPanel)
+
