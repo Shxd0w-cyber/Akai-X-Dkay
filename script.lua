@@ -523,3 +523,199 @@ createToggleRow("PING STABILIZER", "Optimizes physical replication send rate and
 createToggleRow("AUTOMATIC RUNTIME", "Executes optimizations silently upon player spawn cycles", "autoRun", settingsPanel)
 createToggleRow("INTERFACE SHADOWS", "Toggles backend borders to lower rendering drawcalls", "uiShadows", settingsPanel)
 
+task.spawn(function()
+    while task.wait(3) do
+        if masterLagReduction then
+            local setfpscapFunc = setfpscap or set_fps_cap
+            if setfpscapFunc then
+                setfpscapFunc(999)
+            else
+                safeboxSetFFlag("DFIntTaskSchedulerTargetFps", 999)
+            end
+
+            safeboxSetFFlag("FFlagSmoothScheduler", true)
+            safeboxSetFFlag("DFFlagThreadedSteppedFix", true)
+            safeboxSetFFlag("FFlagDebugReportPhysicsErrors", false)
+
+            if toggleStates.memoryCleanup then
+                for _, obj in ipairs(workspace:GetDescendants()) do
+                    if obj:IsA("Explosion") or obj:IsA("ShirtGraphic") then
+                        obj:Destroy()
+                    end
+                end
+
+                pcall(function()
+                    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+                    settings().Rendering.MeshCacheSize = 256
+                end)
+                
+                print("[Akai-X-Dkay] Cleaned local memory registers & geometric caches.")
+            end
+
+            if toggleStates.pingStabilizer or toggleStates.packetThrottling then
+                safeboxSetFFlag("FFlagThrottleUnreliablePackets", true)
+                safeboxSetFFlag("DFFlagFixPingSpikes", true)
+                safeboxSetFFlag("DFIntNetworkMinSendInterval", 15)
+                safeboxSetFFlag("FFlagNetworkUseNewTransport", true)
+
+                pcall(function()
+                    local networkSettings = settings().Network
+                    local baseSettings = settings()
+
+                    networkSettings.IncomingReplicationLag = 0
+                    networkSettings.PhysicsSendRate = 20
+
+                    if baseSettings.Diagnostics then
+                        baseSettings.Diagnostics.LuaRamLimit = 0
+                    end
+                end)
+
+                if terrain then
+                    terrain.WaterWaveSize = 0
+                    terrain.WaterWaveSpeed = 0
+                end
+                print("[Akai-X-Dkay] Network, pipelines, and replication profiles maximized.")
+            end
+        end
+    end
+end)
+
+--------------------------------------------------------------------------------
+-- PERSISTENT HUD OVERLAY
+--------------------------------------------------------------------------------
+local hudGui = Instance.new("ScreenGui")
+hudGui.Name = "AkaiXPersistentHUD"
+hudGui.ResetOnSpawn = false
+hudGui.Parent = playerGui
+
+local hudLabel = Instance.new("TextLabel")
+hudLabel.Size = UDim2.new(0, 120, 0, 30)
+hudLabel.Position = UDim2.new(0, 15, 0.4, 0)
+hudLabel.BackgroundTransparency = 1
+hudLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+hudLabel.Font = Enum.Font.GothamBold
+hudLabel.TextSize = 16
+hudLabel.TextXAlignment = Enum.TextXAlignment.Left
+hudLabel.Visible = false
+hudLabel.Parent = hudGui
+
+--------------------------------------------------------------------------------
+-- UI CONSTRUCTION & RESTORE BADGE MATRIX
+--------------------------------------------------------------------------------
+local gui = Instance.new("ScreenGui")
+gui.Name = "AkaiXDkayServerTuner"
+gui.ResetOnSpawn = false
+gui.Parent = playerGui
+
+-- Direct Web Integration Pipeline using your working Catbox Link
+local iconWebURL = "https://files.catbox.moe/7fg949.png"
+local localAssetPath = "AkaiCustomBadgeIcon.png"
+
+pcall(function()
+    if writefile and getcustomasset then
+        local success, imageData = pcall(function() return game:HttpGet(iconWebURL) end)
+        if success and imageData then
+            writefile(localAssetPath, imageData)
+        end
+    end
+end)
+
+-- Floating Restore Circle Badge (Upgraded to ImageButton)
+local restoreCircle = Instance.new("ImageButton")
+restoreCircle.Name = "RestoreBadge"
+restoreCircle.Size = UDim2.new(0, 55, 0, 55)
+restoreCircle.Position = UDim2.new(0.05, 0, 0.2, 0)
+restoreCircle.BackgroundColor3 = Color3.fromRGB(20, 25, 35) 
+restoreCircle.Visible = false
+restoreCircle.Active = true
+restoreCircle.Draggable = true
+restoreCircle.Parent = gui
+
+-- Dynamic executor asset checker mapping
+if getcustomasset and pcall(function() getcustomasset(localAssetPath) end) then
+    restoreCircle.Image = getcustomasset(localAssetPath)
+else
+    -- Server configuration backup icon if executor folder path is write-locked
+    restoreCircle.Image = "rbxassetid://10848301131"
+    restoreCircle.ImageColor3 = Color3.fromRGB(255, 76, 76)
+end
+
+restoreCircle.ScaleType = Enum.ScaleType.Fit
+
+local badgeCorner = Instance.new("UICorner")
+badgeCorner.CornerRadius = UDim.new(1, 0)
+badgeCorner.Parent = restoreCircle
+
+local badgeStroke = Instance.new("UIStroke")
+badgeStroke.Color = Color3.fromRGB(255, 76, 76) 
+badgeStroke.Thickness = 2
+badgeStroke.Parent = restoreCircle
+
+-- Main Core Window
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 650, 0, 420)
+mainFrame.Position = UDim2.new(0.5, -325, 0.5, -210)
+mainFrame.BackgroundColor3 = Color3.fromRGB(13, 16, 24)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = gui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.Parent = mainFrame
+
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Color = Color3.fromRGB(35, 42, 60)
+mainStroke.Thickness = 1.5
+mainStroke.Parent = mainFrame
+
+local headerText = Instance.new("TextLabel")
+headerText.Size = UDim2.new(0, 350, 0, 30)
+headerText.Position = UDim2.new(0, 20, 0, 10)
+headerText.BackgroundTransparency = 1
+headerText.Text = "⚡ <font color='#ff4c4c'>AKAI-X-DKAY</font> - Server Tuner v1.5"
+headerText.RichText = true
+headerText.TextSize = 14
+headerText.Font = Enum.Font.GothamBold
+headerText.TextColor3 = Color3.fromRGB(160, 175, 200)
+headerText.TextXAlignment = Enum.TextXAlignment.Left
+headerText.Parent = mainFrame
+
+-- Window Operation Actions (Close, Minimize, Restore)
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 25, 0, 25)
+closeBtn.Position = UDim2.new(1, -35, 0, 10)
+closeBtn.BackgroundTransparency = 1
+closeBtn.Text = "✕"
+closeBtn.TextColor3 = Color3.fromRGB(90, 105, 130)
+closeBtn.TextSize = 16
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.Parent = mainFrame
+
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0, 25, 0, 25)
+minimizeBtn.Position = UDim2.new(1, -65, 0, 10)
+minimizeBtn.BackgroundTransparency = 1
+minimizeBtn.Text = "⎯"
+minimizeBtn.TextColor3 = Color3.fromRGB(90, 105, 130)
+minimizeBtn.TextSize = 14
+minimizeBtn.Font = Enum.Font.GothamBold
+minimizeBtn.Parent = mainFrame
+
+closeBtn.MouseButton1Click:Connect(function() 
+    gui:Destroy() 
+end)
+
+minimizeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    restoreCircle.Visible = true
+end)
+
+restoreCircle.MouseButton1Click:Connect(function()
+    restoreCircle.Visible = false
+    mainFrame.Visible = true
+end)
+
+
