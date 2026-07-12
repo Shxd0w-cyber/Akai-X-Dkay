@@ -344,7 +344,7 @@ local function generatePanel(name, isDefault)
     panel.Position = UDim2.new(0, 160, 0, 50)
     panel.BackgroundTransparency = 1
     panel.Visible = isDefault
-    panel.CanvasSize = UDim2.new(0, 0, 0, 400)
+    panel.CanvasSize = UDim2.new(0, 0, 0, 430) -- Expanded canvas size for new slider
     panel.ScrollBarThickness = 2
     panel.Parent = mainFrame
 
@@ -462,21 +462,22 @@ task.spawn(function()
 end)
 
 --------------------------------------------------------------------------------
--- SLIDER ROUTING FRAMEWORK
+-- SLIDER ROUTING FRAMEWORK (INTERACTIVE SENSITIVITY & RENDER RANGE)
 --------------------------------------------------------------------------------
-local function createSliderRow(title, desc, parentPanel)
+local function createSliderRow(title, minVal, maxVal, startVal, desc, parentPanel, callback)
     local container = Instance.new("Frame")
-    container.Size = UDim2.new(1, -10, 0, 70)
+    container.Size = UDim2.new(1, -10, 0, 75)
     container.BackgroundColor3 = Color3.fromRGB(18, 22, 32)
     container.Parent = parentPanel
     Instance.new("UICorner", container).CornerRadius = UDim.new(0, 6)
     Instance.new("UIStroke", container).Color = Color3.fromRGB(28, 35, 50)
 
+    local currentVal = startVal
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, -20, 0, 20)
     label.Position = UDim2.new(0, 15, 0, 8)
     label.BackgroundTransparency = 1
-    label.Text = title .. " (<font color='#ff4c4c'>" .. renderDistanceValue .. " studs</font>)"
+    label.Text = title .. " (<font color='#ff4c4c'>" .. currentVal .. "</font>)"
     label.RichText = true
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.Font = Enum.Font.GothamBold
@@ -484,18 +485,51 @@ local function createSliderRow(title, desc, parentPanel)
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = container
 
-    local slideBar = Instance.new("Frame")
+    local slideBar = Instance.new("TextButton")
     slideBar.Size = UDim2.new(1, -30, 0, 6)
-    slideBar.Position = UDim2.new(0, 15, 0, 48)
+    slideBar.Position = UDim2.new(0, 15, 0, 50)
     slideBar.BackgroundColor3 = Color3.fromRGB(40, 48, 68)
+    slideBar.Text = ""
+    slideBar.AutoButtonColor = false
     slideBar.Parent = container
     Instance.new("UICorner", slideBar)
 
     local fill = Instance.new("Frame")
-    fill.Size = UDim2.new(0.4, 0, 1, 0)
+    local startScale = (startVal - minVal) / (maxVal - minVal)
+    fill.Size = UDim2.new(startScale, 0, 1, 0)
     fill.BackgroundColor3 = Color3.fromRGB(255, 76, 76)
     fill.Parent = slideBar
     Instance.new("UICorner", fill)
+
+    local function updateSliderInput(input)
+        local rawScale = math.clamp((input.Position.X - slideBar.AbsolutePosition.X) / slideBar.AbsoluteSize.X, 0, 1)
+        local value = math.round(minVal + (rawScale * (maxVal - minVal)))
+        
+        fill.Size = UDim2.new(rawScale, 0, 1, 0)
+        label.Text = title .. " (<font color='#ff4c4c'>" .. value .. "</font>)"
+        
+        if callback then callback(value) end
+    end
+
+    local dragging = false
+    slideBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            updateSliderInput(input)
+        end
+    end)
+
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            updateSliderInput(input)
+        end
+    end)
+
+    game:GetService("UserInputService").InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
 end
 
 --------------------------------------------------------------------------------
@@ -583,18 +617,32 @@ end
 --------------------------------------------------------------------------------
 -- GENERATE INITIAL CONTENT DOMAIN MAP
 --------------------------------------------------------------------------------
+-- Status Panel Setup (Toggles & Interactive Slider)
 createToggleRow("FPS OVERLAY", "Pins pure black FPS tracking onto your left viewport edge", "fpsOverlay", statusPanel)
+createSliderRow("CAMERA SENSITIVITY", 1, 7, 3, "Adjusts local client tracking speed ratios", statusPanel, function(value)
+    -- Map value linearly to Roblox standard mouse configuration profiles
+    pcall(function()
+        settings().UserInputService.MouseSensitivity = (value / 3)
+    end)
+end)
 
-createSliderRow("MANUAL RENDER RANGE", "Scales engine chunk rendering algorithms", optimizationPanel)
+-- Optimization Panel Setup
+createSliderRow("MANUAL RENDER RANGE", 50, 1000, 200, "Scales engine chunk rendering algorithms", optimizationPanel, function(value)
+    renderDistanceValue = value
+end)
 createToggleRow("TEXTURE COMPRESSION", "Forces global asset models into fast configurations", "graphics", optimizationPanel)
 
+-- Anti-Lag Panel Setup
 createToggleRow("LIGHTING TUNER", "Lowers heavy engines & dynamic shadows", "graphics", antiLagPanel)
 createToggleRow("PARTICLE OPTIMIZER", "Limits intense engine visual effects & smoke", "particles", antiLagPanel)
 createToggleRow("DE-SYNC ANTI-LAG", "Optimizes internal frame caching network loops", "antiLag", antiLagPanel)
 createToggleRow("MEMORY CLEANUP", "Automatically flushes garbage collections & uncaps scheduling limits", "memoryCleanup", antiLagPanel)
 
+-- Desync Panel Setup
 createToggleRow("PACKET THROTTLING", "Throttles unreliability buffers to compress network loads", "packetThrottling", desyncPanel)
 createToggleRow("PING STABILIZER", "Optimizes physical replication send rate and packet processing lag", "pingStabilizer", desyncPanel)
 
+-- Settings Panel Setup
 createToggleRow("AUTOMATIC RUNTIME", "Executes optimizations silently upon player spawn cycles", "autoRun", settingsPanel)
 createToggleRow("INTERFACE SHADOWS", "Toggles backend borders to lower rendering drawcalls", "uiShadows", settingsPanel)
+
