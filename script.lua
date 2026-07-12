@@ -1,6 +1,6 @@
 --[[
-    AKAI-X-DKAY - Server Tuner v1.5
-    Fixed Image Formatting & Scope Handling
+    AKAI-X-DKAY - Server Tuner v1.6 (Monochrome Theme)
+    Unified Mobile Optimization Panel
 --]]
 
 local players = game:GetService("Players")
@@ -153,8 +153,7 @@ task.spawn(function()
                     settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
                     settings().Rendering.MeshCacheSize = 256
                 end)
-
-                debug.setmemorylimit(1024 * 1024 * 1024) 
+                
                 print("[Akai-X-Dkay] Cleaned local memory registers & geometric caches.")
             end
 
@@ -198,7 +197,7 @@ local hudLabel = Instance.new("TextLabel")
 hudLabel.Size = UDim2.new(0, 120, 0, 30)
 hudLabel.Position = UDim2.new(0, 15, 0.4, 0)
 hudLabel.BackgroundTransparency = 1
-hudLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+hudLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 hudLabel.Font = Enum.Font.GothamBold
 hudLabel.TextSize = 16
 hudLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -213,7 +212,6 @@ gui.Name = "AkaiXDkayServerTuner"
 gui.ResetOnSpawn = false
 gui.Parent = playerGui
 
--- Direct Web Integration Pipeline using your working Catbox Link
 local iconWebURL = "https://files.catbox.moe/7fg949.png"
 local localAssetPath = "AkaiCustomBadgeIcon.png"
 
@@ -226,24 +224,21 @@ pcall(function()
     end
 end)
 
--- Floating Restore Circle Badge (Upgraded to ImageButton)
 local restoreCircle = Instance.new("ImageButton")
 restoreCircle.Name = "RestoreBadge"
 restoreCircle.Size = UDim2.new(0, 55, 0, 55)
 restoreCircle.Position = UDim2.new(0.05, 0, 0.2, 0)
-restoreCircle.BackgroundColor3 = Color3.fromRGB(20, 25, 35) 
+restoreCircle.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Pure Black
 restoreCircle.Visible = false
 restoreCircle.Active = true
 restoreCircle.Draggable = true
 restoreCircle.Parent = gui
 
--- Dynamic executor asset checker mapping
 if getcustomasset and pcall(function() getcustomasset(localAssetPath) end) then
     restoreCircle.Image = getcustomasset(localAssetPath)
 else
-    -- Server configuration backup icon if executor folder path is write-locked
     restoreCircle.Image = "rbxassetid://10848301131"
-    restoreCircle.ImageColor3 = Color3.fromRGB(255, 76, 76)
+    restoreCircle.ImageColor3 = Color3.fromRGB(255, 255, 255) -- Pure White Icon fallback
 end
 
 restoreCircle.ScaleType = Enum.ScaleType.Fit
@@ -253,16 +248,15 @@ badgeCorner.CornerRadius = UDim.new(1, 0)
 badgeCorner.Parent = restoreCircle
 
 local badgeStroke = Instance.new("UIStroke")
-badgeStroke.Color = Color3.fromRGB(255, 76, 76) 
+badgeStroke.Color = Color3.fromRGB(255, 255, 255) -- Pure White border
 badgeStroke.Thickness = 2
 badgeStroke.Parent = restoreCircle
 
--- Main Core Window
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 650, 0, 420)
 mainFrame.Position = UDim2.new(0.5, -325, 0.5, -210)
-mainFrame.BackgroundColor3 = Color3.fromRGB(13, 16, 24)
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Pure Black Background
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
 mainFrame.Draggable = true
@@ -273,7 +267,7 @@ mainCorner.CornerRadius = UDim.new(0, 12)
 mainCorner.Parent = mainFrame
 
 local mainStroke = Instance.new("UIStroke")
-mainStroke.Color = Color3.fromRGB(35, 42, 60)
+mainStroke.Color = Color3.fromRGB(255, 255, 255) -- High Contrast White stroke
 mainStroke.Thickness = 1.5
 mainStroke.Parent = mainFrame
 
@@ -281,21 +275,20 @@ local headerText = Instance.new("TextLabel")
 headerText.Size = UDim2.new(0, 350, 0, 30)
 headerText.Position = UDim2.new(0, 20, 0, 10)
 headerText.BackgroundTransparency = 1
-headerText.Text = "⚡ <font color='#ff4c4c'>AKAI-X-DKAY</font> - Server Tuner v1.5"
+headerText.Text = "🐻‍❄️ <font color='#ffffff'>AKAI-X-DKAY</font> - Server Tuner v1.6"
 headerText.RichText = true
 headerText.TextSize = 14
 headerText.Font = Enum.Font.GothamBold
-headerText.TextColor3 = Color3.fromRGB(160, 175, 200)
+headerText.TextColor3 = Color3.fromRGB(255, 255, 255) -- White
 headerText.TextXAlignment = Enum.TextXAlignment.Left
 headerText.Parent = mainFrame
 
--- Window Operation Actions (Close, Minimize, Restore)
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 25, 0, 25)
 closeBtn.Position = UDim2.new(1, -35, 0, 10)
 closeBtn.BackgroundTransparency = 1
 closeBtn.Text = "✕"
-closeBtn.TextColor3 = Color3.fromRGB(90, 105, 130)
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeBtn.TextSize = 16
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.Parent = mainFrame
@@ -305,7 +298,7 @@ minimizeBtn.Size = UDim2.new(0, 25, 0, 25)
 minimizeBtn.Position = UDim2.new(1, -65, 0, 10)
 minimizeBtn.BackgroundTransparency = 1
 minimizeBtn.Text = "⎯"
-minimizeBtn.TextColor3 = Color3.fromRGB(90, 105, 130)
+minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 minimizeBtn.TextSize = 14
 minimizeBtn.Font = Enum.Font.GothamBold
 minimizeBtn.Parent = mainFrame
@@ -347,11 +340,6 @@ local function generatePanel(name, isDefault)
     panel.CanvasSize = UDim2.new(0, 0, 0, 440)
     panel.ScrollBarThickness = 2
     panel.Parent = mainFrame
-
-    local layout = Instance.new("UIListLayout")
-    layout.Padding = UDim.new(0, 10)
-    layout.Parent = panel
-    return panel
     return panel
 end
 
@@ -361,15 +349,21 @@ local antiLagPanel = generatePanel("AntiLag", true)
 local desyncPanel = generatePanel("Desync", false)
 local settingsPanel = generatePanel("Settings", false)
 
+local layoutS = Instance.new("UIListLayout") layoutS.Padding = UDim.new(0, 10) layoutS.Parent = statusPanel
+local layoutO = Instance.new("UIListLayout") layoutO.Padding = UDim.new(0, 10) layoutO.Parent = optimizationPanel
+local layoutA = Instance.new("UIListLayout") layoutA.Padding = UDim.new(0, 10) layoutA.Parent = antiLagPanel
+local layoutD = Instance.new("UIListLayout") layoutD.Padding = UDim.new(0, 10) layoutD.Parent = desyncPanel
+local layoutSe = Instance.new("UIListLayout") layoutSe.Padding = UDim.new(0, 10) layoutSe.Parent = settingsPanel
+
 local function createTabButton(name, iconText, targetPanel, startActive)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, 0, 0, 45)
     btn.BackgroundTransparency = startActive and 0.85 or 1
-    btn.BackgroundColor3 = Color3.fromRGB(255, 76, 76)
+    btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White indicator backbar
     btn.Text = iconText .. "\n" .. name
     btn.Font = Enum.Font.GothamBold
     btn.TextSize = 10
-    btn.TextColor3 = startActive and Color3.fromRGB(255, 76, 76) or Color3.fromRGB(110, 125, 150)
+    btn.TextColor3 = startActive and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
     btn.Parent = sidebar
 
     local corner = Instance.new("UICorner")
@@ -378,7 +372,7 @@ local function createTabButton(name, iconText, targetPanel, startActive)
 
     local activeInd = Instance.new("Frame")
     activeInd.Size = UDim2.new(0, 4, 1, 0)
-    activeInd.BackgroundColor3 = Color3.fromRGB(255, 76, 76)
+    activeInd.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White line tag
     activeInd.BorderSizePixel = 0
     activeInd.Visible = startActive
     activeInd.Parent = btn
@@ -395,12 +389,12 @@ local function createTabButton(name, iconText, targetPanel, startActive)
         for _, child in ipairs(sidebar:GetChildren()) do
             if child:IsA("TextButton") then
                 child.BackgroundTransparency = 1
-                child.TextColor3 = Color3.fromRGB(110, 125, 150)
+                child.TextColor3 = Color3.fromRGB(150, 150, 150)
                 if child:FindFirstChild("Frame") then child.Frame.Visible = false end
             end
         end
-        btn.BackgroundTransparency = 0.85
-        btn.TextColor3 = Color3.fromRGB(255, 76, 76)
+        btn.BackgroundTransparency = 0.2
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
         activeInd.Visible = true
     end)
 end
@@ -417,10 +411,10 @@ createTabButton("SETTINGS", "⚙️", settingsPanel, false)
 local function createStatDisplay(title, initialValue, parent)
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1, -10, 0, 50)
-    frame.BackgroundColor3 = Color3.fromRGB(18, 22, 32)
+    frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Pure dark item frames
     frame.Parent = parent
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
-    Instance.new("UIStroke", frame).Color = Color3.fromRGB(28, 35, 50)
+    Instance.new("UIStroke", frame).Color = Color3.fromRGB(50, 50, 50) -- Slate accent outline
 
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, -20, 1, 0)
@@ -450,9 +444,9 @@ task.spawn(function()
             connectionPing = math.round(stats.PerformanceStats.Ping:GetValue())
         end)
 
-        fpsLabel.Text = "FPS: <font color='#4ce4e6'>" .. fpsCount .. "</font>"
+        fpsLabel.Text = "FPS: <font color='#ffffff'>" .. fpsCount .. "</font>"
         fpsLabel.RichText = true
-        pingLabel.Text = "PING: <font color='#4ce4e6'>" .. connectionPing .. " ms</font>"
+        pingLabel.Text = "PING: <font color='#ffffff'>" .. connectionPing .. " ms</font>"
         pingLabel.RichText = true
 
         if toggleStates.fpsOverlay then
@@ -464,22 +458,22 @@ task.spawn(function()
 end)
 
 --------------------------------------------------------------------------------
--- SLIDER ROUTING FRAMEWORK (INTERACTIVE MOBILE INPUT ADJUSTMENTS)
+-- SLIDER ROUTING FRAMEWORK (MONOCHROME MOBILE VARIANT)
 --------------------------------------------------------------------------------
 local function createSliderRow(title, minVal, maxVal, startVal, isDecimal, desc, parentPanel, callback)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, -10, 0, 75)
-    container.BackgroundColor3 = Color3.fromRGB(18, 22, 32)
+    container.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     container.Parent = parentPanel
     Instance.new("UICorner", container).CornerRadius = UDim.new(0, 6)
-    Instance.new("UIStroke", container).Color = Color3.fromRGB(28, 35, 50)
+    Instance.new("UIStroke", container).Color = Color3.fromRGB(50, 50, 50)
 
     local currentVal = startVal
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, -20, 0, 20)
     label.Position = UDim2.new(0, 15, 0, 8)
     label.BackgroundTransparency = 1
-    label.Text = title .. " (<font color='#ff4c4c'>" .. string.format(isDecimal and "%.1f" or "%d", currentVal) .. "</font>)"
+    label.Text = title .. " (<font color='#ffffff'>" .. string.format(isDecimal and "%.1f" or "%d", currentVal) .. "</font>)"
     label.RichText = true
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.Font = Enum.Font.GothamBold
@@ -490,7 +484,7 @@ local function createSliderRow(title, minVal, maxVal, startVal, isDecimal, desc,
     local slideBar = Instance.new("TextButton")
     slideBar.Size = UDim2.new(1, -30, 0, 12)
     slideBar.Position = UDim2.new(0, 15, 0, 46)
-    slideBar.BackgroundColor3 = Color3.fromRGB(40, 48, 68)
+    slideBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     slideBar.Text = ""
     slideBar.AutoButtonColor = false
     slideBar.Parent = container
@@ -499,7 +493,7 @@ local function createSliderRow(title, minVal, maxVal, startVal, isDecimal, desc,
     local fill = Instance.new("Frame")
     local startScale = (startVal - minVal) / (maxVal - minVal)
     fill.Size = UDim2.new(startScale, 0, 1, 0)
-    fill.BackgroundColor3 = Color3.fromRGB(255, 76, 76)
+    fill.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White dynamic filler tracking bar
     fill.Parent = slideBar
     Instance.new("UICorner", fill)
 
@@ -515,7 +509,7 @@ local function createSliderRow(title, minVal, maxVal, startVal, isDecimal, desc,
         
         local finalScale = (value - minVal) / (maxVal - minVal)
         fill.Size = UDim2.new(finalScale, 0, 1, 0)
-        label.Text = title .. " (<font color='#ff4c4c'>" .. string.format(isDecimal and "%.1f" or "%d", value) .. "</font>)"
+        label.Text = title .. " (<font color='#ffffff'>" .. string.format(isDecimal and "%.1f" or "%d", value) .. "</font>)"
         
         if callback then callback(value) end
     end
@@ -553,13 +547,15 @@ local function buildGuiToggle(container, stateKey, title, switchBg, switchKnob, 
             toggleStates[stateKey] = not toggleStates[stateKey]
 
             if toggleStates[stateKey] then
-                label.Text = title .. " <font color='#ff4c4c'>(ON)</font>"
-                tweenService:Create(switchBg, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 76, 76)}):Play()
+                label.Text = title .. " <font color='#ffffff'>(ON)</font>"
+                tweenService:Create(switchBg, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
                 tweenService:Create(switchKnob, TweenInfo.new(0.2), {Position = UDim2.new(1, -19, 0.5, -8)}):Play()
+                tweenService:Create(switchKnob, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 0, 0)}):Play()
             else
-                label.Text = title .. " <font color='#78879b'>(OFF)</font>"
-                tweenService:Create(switchBg, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 48, 68)}):Play()
+                label.Text = title .. " <font color='#808080'>(OFF)</font>"
+                tweenService:Create(switchBg, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play()
                 tweenService:Create(switchKnob, TweenInfo.new(0.2), {Position = UDim2.new(0, 3, 0.5, -8)}):Play()
+                tweenService:Create(switchKnob, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
             end
 
             if stateKey == "fpsOverlay" then
@@ -575,16 +571,16 @@ end
 local function createToggleRow(title, desc, stateKey, parentPanel)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, -10, 0, 55)
-    container.BackgroundColor3 = Color3.fromRGB(18, 22, 32)
+    container.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     container.Parent = parentPanel
     Instance.new("UICorner", container).CornerRadius = UDim.new(0, 6)
-    Instance.new("UIStroke", container).Color = Color3.fromRGB(28, 35, 50)
+    Instance.new("UIStroke", container).Color = Color3.fromRGB(50, 50, 50)
 
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, -100, 0, 20)
     label.Position = UDim2.new(0, 65, 0, 8)
     label.BackgroundTransparency = 1
-    label.Text = title .. (toggleStates[stateKey] and " <font color='#ff4c4c'>(ON)</font>" or " <font color='#78879b'>(OFF)</font>")
+    label.Text = title .. (toggleStates[stateKey] and " <font color='#ffffff'>(ON)</font>" or " <font color='#808080'>(OFF)</font>")
     label.RichText = true
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.Font = Enum.Font.GothamBold
@@ -597,7 +593,7 @@ local function createToggleRow(title, desc, stateKey, parentPanel)
     descLabel.Position = UDim2.new(0, 65, 0, 26)
     descLabel.BackgroundTransparency = 1
     descLabel.Text = desc
-    descLabel.TextColor3 = Color3.fromRGB(120, 135, 155)
+    descLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
     descLabel.Font = Enum.Font.Gotham
     descLabel.TextSize = 10
     descLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -606,14 +602,14 @@ local function createToggleRow(title, desc, stateKey, parentPanel)
     local switchBg = Instance.new("Frame")
     switchBg.Size = UDim2.new(0, 42, 0, 22)
     switchBg.Position = UDim2.new(0, 12, 0.5, -11)
-    switchBg.BackgroundColor3 = toggleStates[stateKey] and Color3.fromRGB(255, 76, 76) or Color3.fromRGB(40, 48, 68)
+    switchBg.BackgroundColor3 = toggleStates[stateKey] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(40, 40, 40)
     switchBg.Parent = container
     Instance.new("UICorner", switchBg).CornerRadius = UDim.new(1, 0)
 
     local switchKnob = Instance.new("Frame")
     switchKnob.Size = UDim2.new(0, 16, 0, 16)
     switchKnob.Position = toggleStates[stateKey] and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8)
-    switchKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    switchKnob.BackgroundColor3 = toggleStates[stateKey] and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(255, 255, 255)
     switchKnob.Parent = switchBg
     Instance.new("UICorner", switchKnob).CornerRadius = UDim.new(1, 0)
 
@@ -623,37 +619,29 @@ end
 --------------------------------------------------------------------------------
 -- GENERATE INITIAL CONTENT DOMAIN MAP
 --------------------------------------------------------------------------------
--- Status Panel Setup
 createToggleRow("FPS OVERLAY", "Pins pure black FPS tracking onto your left viewport edge", "fpsOverlay", statusPanel)
 createSliderRow("CAMERA SENSITIVITY", 1.0, 7.0, 1.2, true, "Adjusts dynamic pointer tracking metrics", statusPanel, function(value)
     pcall(function()
-        -- Direct physical delta integration bypasses global restrictions cleanly
         local camera = workspace.CurrentCamera
         if camera then
-            -- Safe environmental configuration profile map
             camera.MouseSensitivity = (value / 3)
         end
     end)
 end)
 
--- Optimization Panel Setup
 createSliderRow("MANUAL RENDER RANGE", 50, 1000, 200, false, "Scales engine chunk rendering algorithms", optimizationPanel, function(value)
     renderDistanceValue = value
 end)
 createToggleRow("TEXTURE COMPRESSION", "Forces global asset models into fast configurations", "graphics", optimizationPanel)
 
--- Anti-Lag Panel Setup
 createToggleRow("LIGHTING TUNER", "Lowers heavy engines & dynamic shadows", "graphics", antiLagPanel)
 createToggleRow("PARTICLE OPTIMIZER", "Limits intense engine visual effects & smoke", "particles", antiLagPanel)
 createToggleRow("DE-SYNC ANTI-LAG", "Optimizes internal frame caching network loops", "antiLag", antiLagPanel)
 createToggleRow("MEMORY CLEANUP", "Automatically flushes garbage collections & uncaps scheduling limits", "memoryCleanup", antiLagPanel)
 
--- Desync Panel Setup
 createToggleRow("PACKET THROTTLING", "Throttles unreliability buffers to compress network loads", "packetThrottling", desyncPanel)
 createToggleRow("PING STABILIZER", "Optimizes physical replication send rate and packet processing lag", "pingStabilizer", desyncPanel)
 
--- Settings Panel Setup
 createToggleRow("AUTOMATIC RUNTIME", "Executes optimizations silently upon player spawn cycles", "autoRun", settingsPanel)
 createToggleRow("INTERFACE SHADOWS", "Toggles backend borders to lower rendering drawcalls", "uiShadows", settingsPanel)
-   
-         
+
