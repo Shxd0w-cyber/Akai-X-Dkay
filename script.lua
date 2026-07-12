@@ -1,6 +1,6 @@
 --[[
     AKAI-X-DKAY - Server Tuner v1.6 (Monochrome Theme)
-    Unified Mobile Optimization Panel
+    Unified Mobile Optimization Panel - Part 1
 --]]
 
 local players = game:GetService("Players")
@@ -26,7 +26,7 @@ local toggleStates = {
     graphics = true,     
     particles = true,    
     antiLag = true,      
-    desyncFix = true,    
+    desyncFix = false,    
     memoryCleanup = true,
     fpsOverlay = false,
 
@@ -142,6 +142,21 @@ task.spawn(function()
             safeboxSetFFlag("DFFlagThreadedSteppedFix", true)
             safeboxSetFFlag("FFlagDebugReportPhysicsErrors", false)
 
+            -- Custom Desync Engine Configuration
+            if toggleStates.desyncFix then
+                safeboxSetFFlag("FFlagPhysicsSenderSendsVelocity", false) 
+                safeboxSetFFlag("DFIntNetworkPredictionMaxUpdateTime", 0)
+                safeboxSetFFlag("DFIntNetworkPredictionMaxRollbackTime", 0)
+                safeboxSetFFlag("FFlagThrottleUnreliablePackets", true)
+                safeboxSetFFlag("DFIntNetworkMinSendInterval", 50) 
+                print("[Akai-X-Dkay] Physics desync matrix active. Velocity data spoofed.")
+            else
+                safeboxSetFFlag("FFlagPhysicsSenderSendsVelocity", true)
+                safeboxSetFFlag("DFIntNetworkPredictionMaxUpdateTime", 120)
+                safeboxSetFFlag("FFlagThrottleUnreliablePackets", false)
+                safeboxSetFFlag("DFIntNetworkMinSendInterval", 15)
+            end
+
             if toggleStates.memoryCleanup then
                 for _, obj in ipairs(workspace:GetDescendants()) do
                     if obj:IsA("Explosion") or obj:IsA("ShirtGraphic") then
@@ -158,9 +173,7 @@ task.spawn(function()
             end
 
             if toggleStates.pingStabilizer or toggleStates.packetThrottling then
-                safeboxSetFFlag("FFlagThrottleUnreliablePackets", true)
                 safeboxSetFFlag("DFFlagFixPingSpikes", true)
-                safeboxSetFFlag("DFIntNetworkMinSendInterval", 15)
                 safeboxSetFFlag("FFlagNetworkUseNewTransport", true)
 
                 pcall(function()
@@ -228,7 +241,7 @@ local restoreCircle = Instance.new("ImageButton")
 restoreCircle.Name = "RestoreBadge"
 restoreCircle.Size = UDim2.new(0, 55, 0, 55)
 restoreCircle.Position = UDim2.new(0.05, 0, 0.2, 0)
-restoreCircle.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Pure Black
+restoreCircle.BackgroundColor3 = Color3.fromRGB(0, 0, 0) 
 restoreCircle.Visible = false
 restoreCircle.Active = true
 restoreCircle.Draggable = true
@@ -238,7 +251,7 @@ if getcustomasset and pcall(function() getcustomasset(localAssetPath) end) then
     restoreCircle.Image = getcustomasset(localAssetPath)
 else
     restoreCircle.Image = "rbxassetid://10848301131"
-    restoreCircle.ImageColor3 = Color3.fromRGB(255, 255, 255) -- Pure White Icon fallback
+    restoreCircle.ImageColor3 = Color3.fromRGB(255, 255, 255)
 end
 
 restoreCircle.ScaleType = Enum.ScaleType.Fit
@@ -248,7 +261,7 @@ badgeCorner.CornerRadius = UDim.new(1, 0)
 badgeCorner.Parent = restoreCircle
 
 local badgeStroke = Instance.new("UIStroke")
-badgeStroke.Color = Color3.fromRGB(255, 255, 255) -- Pure White border
+badgeStroke.Color = Color3.fromRGB(255, 255, 255) 
 badgeStroke.Thickness = 2
 badgeStroke.Parent = restoreCircle
 
@@ -256,7 +269,7 @@ local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 650, 0, 420)
 mainFrame.Position = UDim2.new(0.5, -325, 0.5, -210)
-mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Pure Black Background
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) 
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
 mainFrame.Draggable = true
@@ -267,7 +280,7 @@ mainCorner.CornerRadius = UDim.new(0, 12)
 mainCorner.Parent = mainFrame
 
 local mainStroke = Instance.new("UIStroke")
-mainStroke.Color = Color3.fromRGB(255, 255, 255) -- High Contrast White stroke
+mainStroke.Color = Color3.fromRGB(255, 255, 255) 
 mainStroke.Thickness = 1.5
 mainStroke.Parent = mainFrame
 
@@ -279,7 +292,7 @@ headerText.Text = "🐻‍❄️ <font color='#ffffff'>AKAI-X-DKAY</font> - Serv
 headerText.RichText = true
 headerText.TextSize = 14
 headerText.Font = Enum.Font.GothamBold
-headerText.TextColor3 = Color3.fromRGB(255, 255, 255) -- White
+headerText.TextColor3 = Color3.fromRGB(255, 255, 255) 
 headerText.TextXAlignment = Enum.TextXAlignment.Left
 headerText.Parent = mainFrame
 
@@ -359,7 +372,7 @@ local function createTabButton(name, iconText, targetPanel, startActive)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, 0, 0, 45)
     btn.BackgroundTransparency = startActive and 0.85 or 1
-    btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White indicator backbar
+    btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255) 
     btn.Text = iconText .. "\n" .. name
     btn.Font = Enum.Font.GothamBold
     btn.TextSize = 10
@@ -372,7 +385,7 @@ local function createTabButton(name, iconText, targetPanel, startActive)
 
     local activeInd = Instance.new("Frame")
     activeInd.Size = UDim2.new(0, 4, 1, 0)
-    activeInd.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White line tag
+    activeInd.BackgroundColor3 = Color3.fromRGB(255, 255, 255) 
     activeInd.BorderSizePixel = 0
     activeInd.Visible = startActive
     activeInd.Parent = btn
@@ -411,10 +424,10 @@ createTabButton("SETTINGS", "⚙️", settingsPanel, false)
 local function createStatDisplay(title, initialValue, parent)
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1, -10, 0, 50)
-    frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Pure dark item frames
+    frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) 
     frame.Parent = parent
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
-    Instance.new("UIStroke", frame).Color = Color3.fromRGB(50, 50, 50) -- Slate accent outline
+    Instance.new("UIStroke", frame).Color = Color3.fromRGB(50, 50, 50) 
 
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, -20, 1, 0)
@@ -458,7 +471,7 @@ task.spawn(function()
 end)
 
 --------------------------------------------------------------------------------
--- SLIDER ROUTING FRAMEWORK (MONOCHROME MOBILE VARIANT)
+-- SLIDER ROUTING FRAMEWORK (MONOCHROME VARIANT)
 --------------------------------------------------------------------------------
 local function createSliderRow(title, minVal, maxVal, startVal, isDecimal, desc, parentPanel, callback)
     local container = Instance.new("Frame")
@@ -493,7 +506,7 @@ local function createSliderRow(title, minVal, maxVal, startVal, isDecimal, desc,
     local fill = Instance.new("Frame")
     local startScale = (startVal - minVal) / (maxVal - minVal)
     fill.Size = UDim2.new(startScale, 0, 1, 0)
-    fill.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White dynamic filler tracking bar
+    fill.BackgroundColor3 = Color3.fromRGB(255, 255, 255) 
     fill.Parent = slideBar
     Instance.new("UICorner", fill)
 
@@ -619,6 +632,7 @@ end
 --------------------------------------------------------------------------------
 -- GENERATE INITIAL CONTENT DOMAIN MAP
 --------------------------------------------------------------------------------
+-- Status Panel Setup
 createToggleRow("FPS OVERLAY", "Pins pure black FPS tracking onto your left viewport edge", "fpsOverlay", statusPanel)
 createSliderRow("CAMERA SENSITIVITY", 1.0, 7.0, 1.2, true, "Adjusts dynamic pointer tracking metrics", statusPanel, function(value)
     pcall(function()
@@ -629,19 +643,22 @@ createSliderRow("CAMERA SENSITIVITY", 1.0, 7.0, 1.2, true, "Adjusts dynamic poin
     end)
 end)
 
+-- Optimization Panel Setup
 createSliderRow("MANUAL RENDER RANGE", 50, 1000, 200, false, "Scales engine chunk rendering algorithms", optimizationPanel, function(value)
     renderDistanceValue = value
 end)
 createToggleRow("TEXTURE COMPRESSION", "Forces global asset models into fast configurations", "graphics", optimizationPanel)
 
+-- Anti-Lag Panel Setup
 createToggleRow("LIGHTING TUNER", "Lowers heavy engines & dynamic shadows", "graphics", antiLagPanel)
 createToggleRow("PARTICLE OPTIMIZER", "Limits intense engine visual effects & smoke", "particles", antiLagPanel)
 createToggleRow("DE-SYNC ANTI-LAG", "Optimizes internal frame caching network loops", "antiLag", antiLagPanel)
 createToggleRow("MEMORY CLEANUP", "Automatically flushes garbage collections & uncaps scheduling limits", "memoryCleanup", antiLagPanel)
 
-createToggleRow("PACKET THROTTLING", "Throttles unreliability buffers to compress network loads", "packetThrottling", desyncPanel)
+-- Desync Panel Setup
+createToggleRow("PHYSICS DESYNC", "Spoofs velocity updates and network packet replication ranges", "desyncFix", desyncPanel)
 createToggleRow("PING STABILIZER", "Optimizes physical replication send rate and packet processing lag", "pingStabilizer", desyncPanel)
 
+-- Settings Panel Setup
 createToggleRow("AUTOMATIC RUNTIME", "Executes optimizations silently upon player spawn cycles", "autoRun", settingsPanel)
 createToggleRow("INTERFACE SHADOWS", "Toggles backend borders to lower rendering drawcalls", "uiShadows", settingsPanel)
-
