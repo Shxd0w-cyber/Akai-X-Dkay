@@ -1,4 +1,3 @@
-
 --[[
     AKAI-X-DKAY - Server Tuner v1.5
     Fixed Image Formatting & Scope Handling
@@ -214,19 +213,40 @@ gui.Name = "AkaiXDkayServerTuner"
 gui.ResetOnSpawn = false
 gui.Parent = playerGui
 
--- Floating Restore Circle Badge (Native Asset Integration Fixed)
+-- Direct Web Integration Pipeline using your working Catbox Link
+local iconWebURL = "https://files.catbox.moe/7fg949.png"
+local localAssetPath = "AkaiCustomBadgeIcon.png"
+
+pcall(function()
+    if writefile and getcustomasset then
+        local success, imageData = pcall(function() return game:HttpGet(iconWebURL) end)
+        if success and imageData then
+            writefile(localAssetPath, imageData)
+        end
+    end
+end)
+
+-- Floating Restore Circle Badge (Upgraded to ImageButton)
 local restoreCircle = Instance.new("ImageButton")
 restoreCircle.Name = "RestoreBadge"
 restoreCircle.Size = UDim2.new(0, 55, 0, 55)
 restoreCircle.Position = UDim2.new(0.05, 0, 0.2, 0)
 restoreCircle.BackgroundColor3 = Color3.fromRGB(20, 25, 35) 
-restoreCircle.Image = "rbxassetid://10848301131" 
-restoreCircle.ImageColor3 = Color3.fromRGB(255, 76, 76) 
-restoreCircle.ScaleType = Enum.ScaleType.Fit
 restoreCircle.Visible = false
 restoreCircle.Active = true
 restoreCircle.Draggable = true
 restoreCircle.Parent = gui
+
+-- Dynamic executor asset checker mapping
+if getcustomasset and pcall(function() getcustomasset(localAssetPath) end) then
+    restoreCircle.Image = getcustomasset(localAssetPath)
+else
+    -- Server configuration backup icon if executor folder path is write-locked
+    restoreCircle.Image = "rbxassetid://10848301131"
+    restoreCircle.ImageColor3 = Color3.fromRGB(255, 76, 76)
+end
+
+restoreCircle.ScaleType = Enum.ScaleType.Fit
 
 local badgeCorner = Instance.new("UICorner")
 badgeCorner.CornerRadius = UDim.new(1, 0)
